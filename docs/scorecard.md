@@ -1,17 +1,21 @@
 # Scorecard
 
-> Audit set dated 2026-05-27: 13 completed audits: 7 OSS harness
-> source-recon audits plus 6 extended source/wire/local-install audits.
-> The repo also contains 6 queued audit stubs that are not counted here.
-> Hit-rate columns are absent for the original OSS round because wire
-> capture wasn't performed there. The extended round records redacted
-> mitm evidence where available and marks closed/opaque surfaces explicitly.
+> Audit set dated 2026-05-27: 13 completed audits. The original 7
+> include the default Claude Desktop Code baseline plus source-recon
+> audits for Codex CLI, Aider, OpenCode, Roo Code, Cline, and Continue.
+> The extended 6 add source/wire/local-install audits for managed or
+> desktop surfaces. The repo also contains 6 queued audit stubs that are
+> not counted here. Hit-rate columns are absent for the original
+> source-recon round because live wire capture wasn't performed there;
+> Claude Desktop Code is the exception, backed by clean default Mac
+> Desktop Code logs and cache-usage counters rather than public source
+> lines.
 
 ## Anthropic providers
 
 | Harness | Sets `cache_control`? | Breakpoints | TTL | Volatile-msg bug? | Verdict | Audit |
 |---------|----------------------|-------------|-----|-------------------|---------|-------|
-| Claude Code | yes (inferred) | 3 (system, tools, last) | 5min | no (inferred) | **working** | [`../audits/claude-code.md`](../audits/claude-code.md) |
+| Claude Desktop Code | yes (default Code logs) | embedded Claude Code pattern | 1h + 5m observed | no evidence of volatile thrash | **working** | [`../audits/claude-code.md`](../audits/claude-code.md) |
 | OpenCode | yes | 4 (system×2 split, last 2 msgs) | 5min / 1h flag | partial | **working** | [`../audits/opencode.md`](../audits/opencode.md) |
 | Aider | yes (--cache-prompts) | 4 (system, repo-map, files, current) | 5min | no | **working** | [`../audits/aider.md`](../audits/aider.md) |
 | Cline | yes | 3 (system, last 2 user msgs) | 5min | **yes** | **partial** | [`../audits/cline.md`](../audits/cline.md) |
@@ -135,7 +139,7 @@ Top-level `prompt_cache_ttl` is silently dropped (OpenCode #16848).
 
 1. **Aider** (`--cache-prompts` enabled) — 4 canonical breakpoints, no thrash
 2. **OpenCode** — 4 breakpoints with system split; experimental 1h TTL flag
-3. **Claude Code** — inferred reference implementation (closed source)
+3. **Claude Desktop Code** — clean default Mac Desktop Code logs verify cache reads and cache creation
 4. **Codex CLI** — for OpenAI workloads, top of class
 5. **Roo Code** — partial; volatile-msg bug; ahead of Cline on OpenAI
 6. **Cline** — partial; same volatile-msg bug; broken OpenAI native

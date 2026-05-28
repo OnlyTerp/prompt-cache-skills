@@ -32,7 +32,7 @@ EXPECTED_STUBS = [
 ]
 
 EXPECTED_README_ROWS = [
-    "Claude Code",
+    "Claude Desktop Code",
     "Codex CLI",
     "Aider",
     "OpenCode",
@@ -52,6 +52,30 @@ STALE_COUNT_PHRASES = [
     "13 harnesses graded",
     "7 harness audits from source",
     "13 per-harness audits:",
+    "original 7 source audits",
+    "original OSS/source set",
+    "OSS/source-recon audits",
+]
+
+STALE_CLAUDE_CODE_PHRASES = [
+    "Claude Code | Closed source; cache behavior inferred from wire shape",
+    "No skill; keep as reference/inferred working",
+    "`audits/claude-code.md` — inferred; closed source",
+    "Claude Code** — inferred reference implementation (closed source)",
+    "Claude Code — capture to confirm inferred breakpoint pattern",
+    "Claude Code / Cowork | Desktop Cowork launches embedded Claude Code",
+    "Claude Code / Cowork | **working (verified Cowork cache counters)**",
+    "Claude Code / Cowork baseline verified from desktop local-agent cache counters",
+    "We cannot prove this without source",
+    "Not yet performed. Recipe",
+]
+
+REQUIRED_CLAUDE_CODE_PHRASES = [
+    "Claude Desktop Code | Default Desktop Code launches embedded Claude Code; clean Mac logs show non-zero cache read/create counters by default",
+    "Claude Desktop Code | **working (default Desktop Code verified)**",
+    "Claude Desktop Code | yes (default Code logs)",
+    "default Claude Desktop Code baseline verified from clean Mac cache counters",
+    "default Desktop Code verified with non-zero cache read/create counters",
 ]
 
 
@@ -122,12 +146,22 @@ def check_scorecard_links() -> None:
         fail(f"stub audits listed in scorecard: {sorted(stub_in_scorecard)}")
 
 
-def check_stale_count_phrases() -> None:
+def check_stale_phrases() -> None:
+    stale_phrases = STALE_COUNT_PHRASES + STALE_CLAUDE_CODE_PHRASES
     for path in markdown_files():
         text = path.read_text(errors="replace")
-        for phrase in STALE_COUNT_PHRASES:
+        for phrase in stale_phrases:
             if phrase in text:
-                fail(f"stale count phrase {phrase!r} in {path.relative_to(ROOT)}")
+                fail(f"stale phrase {phrase!r} in {path.relative_to(ROOT)}")
+
+
+def check_claude_desktop_code_phrasing() -> None:
+    corpus = " ".join(
+        "\n".join(path.read_text(errors="replace") for path in markdown_files()).split()
+    )
+    for phrase in REQUIRED_CLAUDE_CODE_PHRASES:
+        if phrase not in corpus:
+            fail(f"missing Claude Desktop Code evidence phrase: {phrase!r}")
 
 
 def check_local_markdown_links() -> None:
@@ -152,7 +186,8 @@ def main() -> None:
     check_audit_counts()
     check_readme_tables()
     check_scorecard_links()
-    check_stale_count_phrases()
+    check_stale_phrases()
+    check_claude_desktop_code_phrasing()
     check_local_markdown_links()
     print("docs consistency ok")
 

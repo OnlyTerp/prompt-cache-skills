@@ -28,7 +28,7 @@
 
 Priority order:
 
-- [x] `audits/claude-code.md` — inferred; closed source
+- [x] `audits/claude-code.md` — working; default Claude Desktop Code verified via clean Mac cache counters, no public source lines
 - [x] `audits/cline.md` — partial; volatile-msg bug; OpenAI broken
 - [x] `audits/roo-code.md` — partial; same Anthropic bug; Bedrock custom ARN gap
 - [x] `audits/aider.md` — working with `--cache-prompts`; 1h TTL gap
@@ -52,7 +52,7 @@ Priority order:
 
 Source recon found bugs but didn't measure hit rates. Pending:
 - [ ] Cline — confirm volatile-msg bug produces non-zero `cache_creation` every turn
-- [ ] Claude Code — capture to confirm inferred breakpoint pattern
+- [ ] Claude Code — fresh stock-build capture to re-confirm the RE-backed breakpoint placement for the current build
 - [ ] Aider — verify 4-breakpoint placement and hit rate ≥80%
 
 ## Phase 4 — Headline artifact

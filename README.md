@@ -27,7 +27,7 @@ One row per completed audit, so the coverage matches the scorecard:
 
 | Harness | Finding | Cost impact today | Fix / status |
 |---------|---------|-------------------|--------------|
-| Claude Code | Closed source; cache behavior inferred from wire shape | No verified bug in this repo | No skill; keep as reference/inferred working |
+| Claude Desktop Code | Default Desktop Code launches embedded Claude Code; clean Mac logs show non-zero cache read/create counters by default | Already gets Anthropic cache benefits; no prompt-caching fix needed | No skill; working baseline |
 | Codex CLI | Correct OpenAI cache design: stable `thread_id` cache key | Already gets OpenAI cache benefits | No skill; reference implementation |
 | Aider | `--cache-prompts` off by default; 5min TTL/keepalive overhead | Many users get 0% cache reads unless they opt in; shorter cache window | Skills: default-on caching + 1h TTL |
 | OpenCode | Strong Anthropic path, but proxy/Bedrock edge cases exist | Some OpenAI-compatible→Anthropic/Bedrock routes miss cache | Skills: proxy detection + Bedrock doc-block fix |
@@ -157,11 +157,11 @@ right. This repo does that work for you.
 
 ## The grade card
 
-13 completed harness audits, dated 2026-05-27. The first 7 are OSS/source-recon audits; the extended 6 include redacted wire or local-install evidence where the surface is closed. Six more files in `audits/` are queued stubs, not completed audits.
+13 completed harness audits, dated 2026-05-27. The original 7 include the default Claude Desktop Code baseline, source-recon audits for Codex CLI, Aider, OpenCode, Roo Code, Cline, and Continue, plus extended source/wire/local-install audits for Hermes/Nous, Codex Desktop, Devin CLI, Windsurf/Cascade, Antigravity, and Grok CLI. Six more files in `audits/` are queued stubs, not completed audits.
 
 | Harness | Anthropic | OpenAI | Bedrock | Gemini | Managed/other |
 |---------|-----------|--------|---------|--------|---------------|
-| Claude Code | working* | n/a | n/a | n/a | n/a |
+| Claude Desktop Code | **working (default Desktop Code verified)** | n/a | n/a | n/a | n/a |
 | Codex CLI | n/a | **working** | n/a | n/a | n/a |
 | Aider | working | automatic | n/a | n/a | n/a |
 | OpenCode | working | working | partial | n/a | n/a |
@@ -175,7 +175,7 @@ right. This repo does that work for you.
 | Antigravity | n/a | n/a | n/a | unverified | unverified (desktop not captured) |
 | Grok CLI | n/a | n/a | n/a | n/a | unverified (model call not captured) |
 
-\* inferred from closed-source wire shape and/or public companion source.
+\* RE-backed or inferred from captured/companion wire shape where public source is unavailable; see the linked audit for caveats.
 
 Full per-provider breakdown with file:line citations in
 [`docs/scorecard.md`](docs/scorecard.md).

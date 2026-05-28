@@ -12,10 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial public release.
 - 13 atomic prompt-caching skills covering Cline, Roo Code, Continue,
   OpenCode, and Aider.
-- 13 completed per-harness audits: the original 7 source audits plus
+- 13 completed per-harness audits: the default Claude Desktop Code
+  baseline verified from clean Mac cache counters, source-recon audits
+  for Codex CLI, Aider, OpenCode, Roo Code, Cline, and Continue, plus
   extended source/wire/local-install audits for Hermes/Nous, Codex
-  Desktop, Devin CLI, Windsurf/Cascade, Antigravity, and Grok CLI.
-  Six additional `audits/` files are queued stubs, not completed audits.
+  Desktop, Devin CLI, Windsurf/Cascade, Antigravity, and Grok CLI. Six
+  additional `audits/` files are queued stubs, not completed audits.
 - Per-provider reference docs (Anthropic, OpenAI, Gemini, Bedrock,
   Vertex) verified against live provider documentation 2026-05-27.
 - 16 numbered gotchas covering the highest-frequency caching

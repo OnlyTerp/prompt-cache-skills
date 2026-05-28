@@ -12,7 +12,9 @@ its own. Skills, not benchmarks; audits are the proof, not the product.
 
 - Concept docs verified against live provider docs (Anthropic, OpenAI,
   Gemini) on 2026-05-27 with shim-derived worked examples folded in.
-- 13 completed harness audits: the original OSS/source set plus extended
+- 13 completed harness audits: the default Claude Desktop Code baseline
+  verified from clean Mac cache counters, source-recon audits for Codex
+  CLI, Aider, OpenCode, Roo Code, Cline, and Continue, plus extended
   source/wire/local-install audits for Hermes/Nous, Codex Desktop,
   Devin CLI, Windsurf/Cascade, Antigravity, and Grok CLI. Six more
   `audits/` files are queued stubs, not completed audits.
