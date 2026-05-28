@@ -1,0 +1,24 @@
+# Captures (developers may want to keep local copies of unsanitized flows)
+*.flow
+!examples/*-sanitized.flow
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets — anything matching these patterns should never be committed
+*.env
+*.envrc
+secrets.json
+.envrc.local
