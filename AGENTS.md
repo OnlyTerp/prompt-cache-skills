@@ -131,10 +131,10 @@ python3 tools/check_docs_consistency.py
 # Markdown lint (CI job: markdown-lint)
 npx markdownlint-cli2 '**/*.md' '!**/node_modules/**'
 
-# Python unit tests
+# Python unit tests (CI job: python-tests)
 python3 -m pytest tests/ -v
 
-# Python type check
+# Python type check (CI job: python-typecheck)
 python3 -m mypy tools/ --strict
 
 # Secrets scan (CI job: secrets-scan — requires gitleaks binary)
@@ -145,7 +145,7 @@ gitleaks dir . --no-banner
 
 GitHub Actions workflow at `.github/workflows/ci.yml` runs on every
 push and PR: gitleaks, markdownlint, python syntax, docs consistency,
-and link check.
+pytest, mypy, and link check.
 
 ## When in doubt
 
