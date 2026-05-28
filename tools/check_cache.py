@@ -49,7 +49,8 @@ def _http(url: str, headers: dict[str, str], body: dict[str, Any]) -> dict[str, 
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
     try:
         with urllib.request.urlopen(req, timeout=120) as resp:
-            return json.loads(resp.read().decode("utf-8"))
+            result: dict[str, Any] = json.loads(resp.read().decode("utf-8"))
+            return result
     except urllib.error.HTTPError as e:
         raise SystemExit(f"HTTP {e.code}: {e.read().decode('utf-8', 'replace')}")
     except urllib.error.URLError as e:
