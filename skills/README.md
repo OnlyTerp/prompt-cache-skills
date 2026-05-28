@@ -19,7 +19,7 @@ Skills are atomic. One bug, one fix. If a harness has 3 bugs there are
 ## How to point your agent at this
 
 ```
-Read https://github.com/<owner>/prompt-cache-skills and apply every
+Read https://github.com/OnlyTerp/prompt-cache-skills and apply every
 skill in skills/ that matches the harnesses I use. Verify each fix
 per its own SKILL.md.
 ```

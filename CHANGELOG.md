@@ -9,6 +9,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Unit test suite for `tools/check_cache.py` and
+  `tools/check_docs_consistency.py` (34 tests via pytest).
+- `mypy --strict` type checking for all Python tooling.
+- CI jobs for pytest and mypy.
+- `pyproject.toml` with mypy and pytest configuration.
+- Development setup section in `AGENTS.md` with all build/lint/test
+  commands.
+
+### Fixed
+
+- LICENSE copyright holder referenced stale project name
+  (`prompt-cache-audit` → `prompt-cache-skills`).
+- README and `skills/README.md` used `<owner>` / `<this-repo>`
+  placeholders instead of actual repo URL.
+- `check_cache.py` now validates the body file (missing file, malformed
+  JSON, non-object body) before attempting API calls.
+- `check_cache.py` now catches `URLError` (connection failures) in
+  addition to `HTTPError`.
+- Mypy strict type annotation fix in `_http()` return value.
+- `FUNDING.yml` pointed at placeholder instead of `OnlyTerp`.
+- `bedrock.md` and `vertex.md` `_Last verified: TODO_` stamped with
+  dates and explicit scaffold caveats.
+
+## [0.1.0] — 2026-05-28
+
+### Added
+
 - Initial public release.
 - 13 atomic prompt-caching skills covering Cline, Roo Code, Continue,
   OpenCode, and Aider.

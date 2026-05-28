@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 460" width="900" height="460">
+  <defs>
+    <linearGradient id="fn-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0e1a"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="fn-accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="460" rx="12" fill="url(#fn-bg)"/>
+
+  <!-- Title -->
+  <text x="450" y="40" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="22" font-weight="700" fill="#f1f5f9" letter-spacing="0.5">Headline Findings</text>
+  <rect x="370" y="50" width="160" height="2.5" rx="1" fill="url(#fn-accent)" opacity="0.7"/>
+
+  <!-- Finding 1 -->
+  <g transform="translate(50, 75)">
+    <rect x="0" y="0" width="390" height="84" rx="8" fill="#1e1b4b" fill-opacity="0.35" stroke="#ef4444" stroke-width="1" stroke-opacity="0.3"/>
+    <circle cx="28" cy="18" r="14" fill="#ef4444" fill-opacity="0.2" stroke="#ef4444" stroke-width="1.5" stroke-opacity="0.5"/>
+    <text x="28" y="23" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="13" font-weight="700" fill="#fca5a5">1</text>
+    <text x="52" y="22" font-family="'Segoe UI', system-ui, sans-serif" font-size="13" font-weight="700" fill="#fca5a5">Copy-paste volatile-message bug</text>
+    <text x="18" y="46" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#cbd5e1">Cline → Roo → Continue all burn a cache</text>
+    <text x="18" y="63" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#cbd5e1">breakpoint on the volatile current turn.</text>
+    <rect x="300" y="53" width="76" height="22" rx="11" fill="#ef4444" fill-opacity="0.15" stroke="#ef4444" stroke-width="0.8" stroke-opacity="0.3"/>
+    <text x="338" y="68" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="10" font-weight="700" fill="#fca5a5">3 harnesses</text>
+  </g>
+
+  <!-- Finding 2 -->
+  <g transform="translate(460, 75)">
+    <rect x="0" y="0" width="390" height="84" rx="8" fill="#1e1b4b" fill-opacity="0.35" stroke="#ef4444" stroke-width="1" stroke-opacity="0.3"/>
+    <circle cx="28" cy="18" r="14" fill="#ef4444" fill-opacity="0.2" stroke="#ef4444" stroke-width="1.5" stroke-opacity="0.5"/>
+    <text x="28" y="23" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="13" font-weight="700" fill="#fca5a5">2</text>
+    <text x="52" y="22" font-family="'Segoe UI', system-ui, sans-serif" font-size="13" font-weight="700" fill="#fca5a5">Cline OpenAI is silently broken</text>
+    <text x="18" y="46" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#cbd5e1">No prompt_cache_key, no prefix-stability.</text>
+    <text x="18" y="63" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#cbd5e1">Cline+OpenAI users pay full price every turn.</text>
+    <rect x="307" y="53" width="70" height="22" rx="11" fill="#ef4444" fill-opacity="0.15" stroke="#ef4444" stroke-width="0.8" stroke-opacity="0.3"/>
+    <text x="342" y="68" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="10" font-weight="700" fill="#fca5a5">0% cache</text>
+  </g>
+
+  <!-- Finding 3 -->
+  <g transform="translate(50, 176)">
+    <rect x="0" y="0" width="390" height="84" rx="8" fill="#1e1b4b" fill-opacity="0.35" stroke="#f59e0b" stroke-width="1" stroke-opacity="0.3"/>
+    <circle cx="28" cy="18" r="14" fill="#f59e0b" fill-opacity="0.2" stroke="#f59e0b" stroke-width="1.5" stroke-opacity="0.5"/>
+    <text x="28" y="23" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="13" font-weight="700" fill="#fcd34d">3</text>
+    <text x="52" y="22" font-family="'Segoe UI', system-ui, sans-serif" font-size="13" font-weight="700" fill="#fcd34d">Gemini explicit caching unimplemented</text>
+    <text x="18" y="46" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#cbd5e1">Only implicit (best-effort) caching engages.</text>
+    <text x="18" y="63" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#cbd5e1">Missing guaranteed 75% discount on long sessions.</text>
+    <rect x="305" y="53" width="72" height="22" rx="11" fill="#f59e0b" fill-opacity="0.15" stroke="#f59e0b" stroke-width="0.8" stroke-opacity="0.3"/>
+    <text x="341" y="68" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="10" font-weight="700" fill="#fcd34d">universal</text>
+  </g>
+
+  <!-- Finding 4 -->
+  <g transform="translate(460, 176)">
+    <rect x="0" y="0" width="390" height="84" rx="8" fill="#1e1b4b" fill-opacity="0.35" stroke="#10b981" stroke-width="1" stroke-opacity="0.3"/>
+    <circle cx="28" cy="18" r="14" fill="#10b981" fill-opacity="0.2" stroke="#10b981" stroke-width="1.5" stroke-opacity="0.5"/>
+    <text x="28" y="23" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="13" font-weight="700" fill="#86efac">4</text>
+    <text x="52" y="22" font-family="'Segoe UI', system-ui, sans-serif" font-size="13" font-weight="700" fill="#86efac">Codex CLI is the reference impl</text>
+    <text x="18" y="46" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#cbd5e1">thread_id as cache key, preserved across</text>
+    <text x="18" y="63" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#cbd5e1">compaction and into sub-agents.</text>
+    <rect x="302" y="53" width="76" height="22" rx="11" fill="#10b981" fill-opacity="0.15" stroke="#10b981" stroke-width="0.8" stroke-opacity="0.3"/>
+    <text x="340" y="68" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="10" font-weight="700" fill="#86efac">gold std</text>
+  </g>
+
+  <!-- Finding 5 -->
+  <g transform="translate(50, 277)">
+    <rect x="0" y="0" width="390" height="64" rx="8" fill="#1e1b4b" fill-opacity="0.35" stroke="#10b981" stroke-width="1" stroke-opacity="0.3"/>
+    <circle cx="28" cy="18" r="14" fill="#10b981" fill-opacity="0.2" stroke="#10b981" stroke-width="1.5" stroke-opacity="0.5"/>
+    <text x="28" y="23" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="13" font-weight="700" fill="#86efac">5</text>
+    <text x="52" y="22" font-family="'Segoe UI', system-ui, sans-serif" font-size="13" font-weight="700" fill="#86efac">OpenCode has best Anthropic pattern</text>
+    <text x="18" y="48" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#cbd5e1">System-prompt split maximizes cache stability.</text>
+  </g>
+
+  <!-- Finding 6 (Hermes/Nous) -->
+  <g transform="translate(460, 277)">
+    <rect x="0" y="0" width="390" height="64" rx="8" fill="#1e1b4b" fill-opacity="0.35" stroke="#10b981" stroke-width="1" stroke-opacity="0.3"/>
+    <circle cx="28" cy="18" r="14" fill="#10b981" fill-opacity="0.2" stroke="#10b981" stroke-width="1.5" stroke-opacity="0.5"/>
+    <text x="28" y="23" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="13" font-weight="700" fill="#86efac">6</text>
+    <text x="52" y="22" font-family="'Segoe UI', system-ui, sans-serif" font-size="13" font-weight="700" fill="#86efac">Hermes/Nous has real cache plumbing</text>
+    <text x="18" y="48" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#cbd5e1">Multi-provider cache with xAI wire-verified tokens.</text>
+  </g>
+
+  <!-- Finding 7 -->
+  <g transform="translate(50, 360)">
+    <rect x="0" y="0" width="800" height="68" rx="8" fill="#1e1b4b" fill-opacity="0.35" stroke="#3b82f6" stroke-width="1" stroke-opacity="0.3"/>
+    <circle cx="28" cy="18" r="14" fill="#3b82f6" fill-opacity="0.2" stroke="#3b82f6" stroke-width="1.5" stroke-opacity="0.5"/>
+    <text x="28" y="23" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="13" font-weight="700" fill="#93c5fd">7</text>
+    <text x="52" y="22" font-family="'Segoe UI', system-ui, sans-serif" font-size="13" font-weight="700" fill="#93c5fd">Closed managed surfaces need transport-aware capture</text>
+    <text x="18" y="48" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#cbd5e1">Devin, Windsurf, Antigravity, and Grok CLI marked unverified — protobuf, desktop-only, or proxy-invisible channels.</text>
+  </g>
+
+  <!-- Border -->
+  <rect x="0.5" y="0.5" width="899" height="459" rx="12" fill="none" stroke="#6366f1" stroke-width="0.5" stroke-opacity="0.15"/>
+</svg>

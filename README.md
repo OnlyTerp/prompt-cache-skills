@@ -1,7 +1,21 @@
-# prompt-cache-skills
+<p align="center">
+  <img src="assets/banner.svg" alt="prompt-cache-skills — Drop-in prompt-caching fixes for every LLM agent harness" width="900">
+</p>
 
-> Drop-in prompt-caching fixes for the LLM agent harness you use.
-> Point your AI coding agent at this repo and it ships the patches.
+<p align="center">
+  <a href="#how-to-use-it"><img src="https://img.shields.io/badge/Get_Started-6366f1?style=for-the-badge&logoColor=white" alt="Get Started"></a>
+  <a href="skills/README.md"><img src="https://img.shields.io/badge/13_Skills-8b5cf6?style=for-the-badge&logoColor=white" alt="13 Skills"></a>
+  <a href="docs/scorecard.md"><img src="https://img.shields.io/badge/13_Completed_Audits-3b82f6?style=for-the-badge&logoColor=white" alt="13 Completed Audits"></a>
+  <a href="#why-this-exists"><img src="https://img.shields.io/badge/Up_to_10x_Savings-10b981?style=for-the-badge&logoColor=white" alt="10x Savings"></a>
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-CC--BY--4.0-blue.svg?style=flat-square" alt="License"></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/audit_date-2026--05--27-purple.svg?style=flat-square" alt="Audit Date"></a>
+  <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome"></a>
+</p>
+
+---
 
 Most popular OSS agent harnesses (Cline, Roo Code, Continue, OpenCode,
 Aider) leave **30-90% off your API bill** on the table because their
@@ -14,12 +28,14 @@ read and apply on its own.
 
 You don't read the diffs. You point your agent at this repo and say:
 
-> "Apply every skill in this repo that matches the harnesses I use."
+> *"Apply every skill in this repo that matches the harnesses I use."*
 
 The agent reads each `SKILL.md`, checks if it applies to your setup,
 lands the diff, and verifies the fix on the wire. You go from broken
-or partial caching to 80-99% cache hit rates without doing the
+or partial caching to **80-99% cache hit rates** without doing the
 research yourself.
+
+---
 
 ## What you actually save
 
@@ -44,14 +60,20 @@ One row per completed audit, so the coverage matches the scorecard:
 13 skills total cover the verified patchable OSS bugs. See
 [`skills/README.md`](skills/README.md) for the full index.
 
+---
+
 ## How to use it
+
+<p align="center">
+  <img src="assets/how-it-works.svg" alt="Three-step process: Point → Detect and Patch → Verify and Save" width="900">
+</p>
 
 ### Option A — point any AI coding agent at this repo
 
 In your agent of choice (Claude Code, Codex, Cline, Cursor, Devin, etc.):
 
 ```
-Read https://github.com/<owner>/prompt-cache-skills
+Read https://github.com/OnlyTerp/prompt-cache-skills
 
 Apply every skill in skills/ that matches the harnesses I currently
 use. For each one:
@@ -70,13 +92,13 @@ If you use one of the agents that supports a skills directory:
 
 ```bash
 # Claude Code
-git clone <this-repo> ~/.claude/skills/prompt-cache-skills
+git clone https://github.com/OnlyTerp/prompt-cache-skills ~/.claude/skills/prompt-cache-skills
 
 # Devin
-git clone <this-repo> ~/.config/devin/skills/prompt-cache-skills
+git clone https://github.com/OnlyTerp/prompt-cache-skills ~/.config/devin/skills/prompt-cache-skills
 
 # OpenCode
-git clone <this-repo> ~/.config/opencode/skills/prompt-cache-skills
+git clone https://github.com/OnlyTerp/prompt-cache-skills ~/.config/opencode/skills/prompt-cache-skills
 ```
 
 Then ask your agent:
@@ -91,7 +113,13 @@ Each [`skills/<name>/SKILL.md`](skills/) is a complete fix: target,
 symptom, diff, verification. Apply the relevant ones manually if you
 don't trust your agent to do it.
 
+---
+
 ## What's in here
+
+<p align="center">
+  <img src="assets/architecture.svg" alt="Repository structure — skills, audits, docs, and tools" width="900">
+</p>
 
 ```
 prompt-cache-skills/
@@ -137,7 +165,13 @@ prompt-cache-skills/
 └── AGENTS.md                     ← entry point for AI agents reading this repo
 ```
 
+---
+
 ## Why this exists
+
+<p align="center">
+  <img src="assets/cost-savings.svg" alt="Cost comparison: $7.50 without caching vs $0.75 with caching — 10x savings" width="900">
+</p>
 
 If your agent harness sends 30,000 tokens of system prompt + tools per
 turn, on Claude 4.7 Opus that's $0.15 per turn uncached vs $0.015
@@ -155,7 +189,13 @@ None of these are hard to fix. They're all 5-15 line diffs. The
 hard part is knowing which one applies to your harness and getting it
 right. This repo does that work for you.
 
+---
+
 ## The grade card
+
+<p align="center">
+  <img src="assets/scorecard.svg" alt="Audit scorecard — 13 harnesses grouped by cache status: working, needs fixes, and unverified" width="900">
+</p>
 
 13 completed harness audits, dated 2026-05-27. The original 7 include the default Claude Desktop Code baseline, source-recon audits for Codex CLI, Aider, OpenCode, Roo Code, Cline, and Continue, plus extended source/wire/local-install audits for Hermes/Nous, Codex Desktop, Devin CLI, Windsurf/Cascade, Antigravity, and Grok CLI. Six more files in `audits/` are queued stubs, not completed audits.
 
@@ -180,7 +220,13 @@ right. This repo does that work for you.
 Full per-provider breakdown with file:line citations in
 [`docs/scorecard.md`](docs/scorecard.md).
 
+---
+
 ## Headline findings
+
+<p align="center">
+  <img src="assets/findings.svg" alt="Seven headline findings from the audit" width="900">
+</p>
 
 1. **The "last 2 user messages" pattern is a copy-paste bug** that
    propagated Cline → Roo → Continue. All three burn a breakpoint on
@@ -201,6 +247,8 @@ Full per-provider breakdown with file:line citations in
    Windsurf, Antigravity, and Grok CLI are marked unverified where the
    model channel was protobuf, desktop-only, or proxy-invisible.
 
+---
+
 ## Trust but verify
 
 Every skill ships with a Verify section that captures the wire and
@@ -212,6 +260,8 @@ token fields.
 Run it before and after applying a skill. You should see
 `cache_read_input_tokens` (Anthropic) or `cached_tokens` (OpenAI) or
 `cachedContentTokenCount` (Gemini) go from 0 to most of your input.
+
+---
 
 ## Contributing
 
@@ -236,8 +286,9 @@ Releases tracked in [`CHANGELOG.md`](CHANGELOG.md).
 
 Skills and audit prose: CC-BY-4.0. Code (`tools/`): MIT.
 
-## Star and share
+---
 
-If this saved you money, share it with the other people using these
-harnesses. The whole point is that everyone gets caching working at
-once.
+<p align="center">
+  <b>If this saved you money, star the repo and share it.</b><br>
+  <sub>The whole point is that everyone gets caching working at once.</sub>
+</p>

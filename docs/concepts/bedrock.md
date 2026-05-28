@@ -114,4 +114,5 @@ gives you a cold cache on the failover region.
 
 ---
 
-_Last verified: TODO_
+_Last verified: 2026-05-28 (scaffold content; model support matrix
+and 1h TTL regional availability need provider-side verification)._

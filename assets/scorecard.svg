@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 580" width="900" height="580">
+  <defs>
+    <linearGradient id="sc-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0e1a"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="sc-accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="580" rx="12" fill="url(#sc-bg)"/>
+
+  <!-- Title -->
+  <text x="450" y="42" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="22" font-weight="700" fill="#f1f5f9" letter-spacing="0.5">Audit Scorecard</text>
+  <rect x="370" y="52" width="160" height="2.5" rx="1" fill="url(#sc-accent)" opacity="0.7"/>
+  <text x="450" y="76" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="13" fill="#94a3b8">13 completed harness audits · 2026-05-27</text>
+
+  <!-- TIER 1: Working / Reference -->
+  <g transform="translate(50, 100)">
+    <rect x="0" y="0" width="800" height="148" rx="10" fill="#052e16" fill-opacity="0.3" stroke="#10b981" stroke-width="1" stroke-opacity="0.25"/>
+    <rect x="0" y="0" width="800" height="34" rx="10" fill="#10b981" fill-opacity="0.12"/>
+    <rect x="0" y="24" width="800" height="10" fill="#052e16" fill-opacity="0.3"/>
+    <text x="20" y="23" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="700" fill="#6ee7b7" letter-spacing="0.5">WORKING — CACHE VERIFIED OR INFERRED</text>
+
+    <!-- Row headers -->
+    <text x="20" y="62" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="600" fill="#e2e8f0">Aider</text>
+    <text x="215" y="62" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#a7f3d0">Anthropic ✓  OpenAI auto ✓</text>
+    <text x="530" y="62" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#94a3b8">Best-in-class: 4 breakpoints, no thrash</text>
+
+    <line x1="20" y1="72" x2="780" y2="72" stroke="#1e3a2f" stroke-width="0.5"/>
+
+    <text x="20" y="92" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="600" fill="#e2e8f0">OpenCode</text>
+    <text x="215" y="92" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#a7f3d0">Anthropic ✓  OpenAI ✓</text>
+    <text x="530" y="92" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#94a3b8">Best Anthropic system-prompt split</text>
+
+    <line x1="20" y1="102" x2="780" y2="102" stroke="#1e3a2f" stroke-width="0.5"/>
+
+    <text x="20" y="122" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="600" fill="#e2e8f0">Claude Code</text>
+    <text x="215" y="122" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#a7f3d0">Anthropic ✓ (inferred)</text>
+    <text x="530" y="122" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#94a3b8">Closed source; wire shape looks correct</text>
+
+    <line x1="20" y1="132" x2="780" y2="132" stroke="#1e3a2f" stroke-width="0.5"/>
+
+    <text x="20" y="143" font-family="'Segoe UI', system-ui, sans-serif" font-size="10" fill="#6ee7b7" font-style="italic">Also working: Codex CLI (OpenAI reference impl) · Codex Desktop (inferred) · Hermes/Nous (multi-provider + xAI verified)</text>
+  </g>
+
+  <!-- TIER 2: Needs Fixes -->
+  <g transform="translate(50, 266)">
+    <rect x="0" y="0" width="800" height="148" rx="10" fill="#451a03" fill-opacity="0.2" stroke="#f59e0b" stroke-width="1" stroke-opacity="0.25"/>
+    <rect x="0" y="0" width="800" height="34" rx="10" fill="#f59e0b" fill-opacity="0.1"/>
+    <rect x="0" y="24" width="800" height="10" fill="#451a03" fill-opacity="0.2"/>
+    <text x="20" y="23" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="700" fill="#fcd34d" letter-spacing="0.5">NEEDS FIXES — SKILLS AVAILABLE IN THIS REPO</text>
+
+    <text x="20" y="62" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="600" fill="#e2e8f0">Cline</text>
+    <rect x="215" y="48" width="56" height="20" rx="10" fill="#ef4444" fill-opacity="0.15" stroke="#ef4444" stroke-width="0.8" stroke-opacity="0.4"/>
+    <text x="243" y="62" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="11" font-weight="600" fill="#fca5a5">broken</text>
+    <text x="285" y="62" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#94a3b8">OpenAI 0% cache · Anthropic volatile-msg bug · 3 skills fix it</text>
+
+    <line x1="20" y1="72" x2="780" y2="72" stroke="#3d2a0a" stroke-width="0.5"/>
+
+    <text x="20" y="92" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="600" fill="#e2e8f0">Roo Code</text>
+    <rect x="215" y="78" width="56" height="20" rx="10" fill="#f59e0b" fill-opacity="0.15" stroke="#f59e0b" stroke-width="0.8" stroke-opacity="0.4"/>
+    <text x="243" y="92" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="11" font-weight="600" fill="#fcd34d">partial</text>
+    <text x="285" y="92" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#94a3b8">Anthropic volatile-msg bug · Bedrock custom ARN gap · 2 skills</text>
+
+    <line x1="20" y1="102" x2="780" y2="102" stroke="#3d2a0a" stroke-width="0.5"/>
+
+    <text x="20" y="122" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="600" fill="#e2e8f0">Continue</text>
+    <rect x="215" y="108" width="56" height="20" rx="10" fill="#f59e0b" fill-opacity="0.15" stroke="#f59e0b" stroke-width="0.8" stroke-opacity="0.4"/>
+    <text x="243" y="122" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="11" font-weight="600" fill="#fcd34d">partial</text>
+    <text x="285" y="122" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#94a3b8">Off by default · Gemini explicit missing · volatile-msg · 3 skills</text>
+
+    <line x1="20" y1="132" x2="780" y2="132" stroke="#3d2a0a" stroke-width="0.5"/>
+
+    <text x="20" y="143" font-family="'Segoe UI', system-ui, sans-serif" font-size="10" fill="#fcd34d" font-style="italic">These 3 harnesses account for all 13 skills in this repo</text>
+  </g>
+
+  <!-- TIER 3: Unverified -->
+  <g transform="translate(50, 432)">
+    <rect x="0" y="0" width="800" height="128" rx="10" fill="#1e293b" fill-opacity="0.3" stroke="#64748b" stroke-width="1" stroke-opacity="0.25"/>
+    <rect x="0" y="0" width="800" height="34" rx="10" fill="#64748b" fill-opacity="0.08"/>
+    <rect x="0" y="24" width="800" height="10" fill="#1e293b" fill-opacity="0.3"/>
+    <text x="20" y="23" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="700" fill="#94a3b8" letter-spacing="0.5">UNVERIFIED — CLOSED OR OPAQUE TRANSPORT</text>
+
+    <text x="20" y="58" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="500" fill="#cbd5e1">Devin CLI</text>
+    <text x="215" y="58" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#64748b">Opaque Codeium/Devin protobuf — can't inspect cache fields</text>
+
+    <line x1="20" y1="68" x2="780" y2="68" stroke="#334155" stroke-width="0.5"/>
+
+    <text x="20" y="84" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="500" fill="#cbd5e1">Windsurf / Cascade</text>
+    <text x="215" y="84" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#64748b">Desktop-only model turn — CLI doesn't expose it</text>
+
+    <line x1="20" y1="94" x2="780" y2="94" stroke="#334155" stroke-width="0.5"/>
+
+    <text x="20" y="110" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="500" fill="#cbd5e1">Antigravity</text>
+    <text x="215" y="110" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#64748b">Desktop-only — no local provider source captured</text>
+
+    <text x="540" y="58" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="500" fill="#cbd5e1">Grok CLI</text>
+    <text x="540" y="84" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#64748b">Model call didn't hit</text>
+    <text x="540" y="100" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#64748b">mitmproxy — needs</text>
+    <text x="540" y="116" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#64748b">transport-aware capture</text>
+  </g>
+
+  <!-- Border -->
+  <rect x="0.5" y="0.5" width="899" height="579" rx="12" fill="none" stroke="#6366f1" stroke-width="0.5" stroke-opacity="0.15"/>
+</svg>
