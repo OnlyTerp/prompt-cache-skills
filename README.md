@@ -23,7 +23,7 @@ research yourself.
 
 ## What you actually save
 
-One row per audited harness, so the coverage matches the scorecard:
+One row per completed audit, so the coverage matches the scorecard:
 
 | Harness | Finding | Cost impact today | Fix / status |
 |---------|---------|-------------------|--------------|
@@ -109,7 +109,7 @@ prompt-cache-skills/
 │   ├── opencode-mistral-cache-key/
 │   ├── aider-1h-ttl/
 │   └── aider-cache-default-on/
-├── audits/                       ← evidence: per-harness audit reports
+├── audits/                       ← evidence: completed audits + queued stubs
 │   ├── cline.md
 │   ├── roo-code.md
 │   ├── aider.md
@@ -122,14 +122,16 @@ prompt-cache-skills/
 │   ├── devin-cli.md
 │   ├── windsurf-cascade.md
 │   ├── antigravity.md
-│   └── grok-cli.md
+│   ├── grok-cli.md
+│   └── queued stubs: crush, goose, aichat, gptme, avante-nvim, kilo-code
 ├── docs/                         ← the underlying API mechanics
 │   ├── concepts/                 ← per-provider caching reference
 │   ├── gotchas.md                ← 16 numbered footguns
 │   ├── verification.md           ← how to confirm caching on wire
-│   └── scorecard.md              ← all harnesses graded at a glance
-├── tools/                        ← scripts to verify caching yourself
+│   └── scorecard.md              ← completed audits graded at a glance
+├── tools/                        ← scripts to verify caching + doc consistency
 │   ├── check_cache.py            ← fire request twice, dump cache_* fields
+│   ├── check_docs_consistency.py ← assert counts/tables/links don't drift
 │   ├── audit_harness.sh
 │   └── replay_harness.md
 └── AGENTS.md                     ← entry point for AI agents reading this repo
@@ -155,7 +157,7 @@ right. This repo does that work for you.
 
 ## The grade card
 
-13 harnesses audited, dated 2026-05-27. The first 7 are OSS/source-recon audits; the extended 6 include redacted wire or local-install evidence where the surface is closed:
+13 completed harness audits, dated 2026-05-27. The first 7 are OSS/source-recon audits; the extended 6 include redacted wire or local-install evidence where the surface is closed. Six more files in `audits/` are queued stubs, not completed audits.
 
 | Harness | Anthropic | OpenAI | Bedrock | Gemini | Managed/other |
 |---------|-----------|--------|---------|--------|---------------|

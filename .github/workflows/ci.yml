@@ -49,7 +49,18 @@ jobs:
         with:
           python-version: '3.11'
       - name: compile-check
-        run: python3 -m py_compile tools/check_cache.py
+        run: python3 -m py_compile tools/check_cache.py tools/check_docs_consistency.py
+
+  consistency:
+    name: docs consistency
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: audit/readme/scorecard consistency
+        run: python3 tools/check_docs_consistency.py
 
   link-check:
     name: link check

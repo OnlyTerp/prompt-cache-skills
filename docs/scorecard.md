@@ -1,10 +1,11 @@
 # Scorecard
 
-> Audit set dated 2026-05-27: 7 OSS harness source-recon audits plus
-> 6 extended source/wire/local-install audits. Hit-rate columns are
-> absent for the original OSS round because wire capture wasn't
-> performed there. The extended round records redacted mitm evidence
-> where available and marks closed/opaque surfaces explicitly.
+> Audit set dated 2026-05-27: 13 completed audits: 7 OSS harness
+> source-recon audits plus 6 extended source/wire/local-install audits.
+> The repo also contains 6 queued audit stubs that are not counted here.
+> Hit-rate columns are absent for the original OSS round because wire
+> capture wasn't performed there. The extended round records redacted
+> mitm evidence where available and marks closed/opaque surfaces explicitly.
 
 ## Anthropic providers
 

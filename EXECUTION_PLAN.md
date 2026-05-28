@@ -12,8 +12,10 @@ its own. Skills, not benchmarks; audits are the proof, not the product.
 
 - Concept docs verified against live provider docs (Anthropic, OpenAI,
   Gemini) on 2026-05-27 with shim-derived worked examples folded in.
-- 7 harness audits from source: Claude Code, Codex CLI, Aider, OpenCode,
-  Roo Code, Cline, Continue. All in [`audits/`](audits/).
+- 13 completed harness audits: the original OSS/source set plus extended
+  source/wire/local-install audits for Hermes/Nous, Codex Desktop,
+  Devin CLI, Windsurf/Cascade, Antigravity, and Grok CLI. Six more
+  `audits/` files are queued stubs, not completed audits.
 - 13 atomic skills covering the highest-impact fixes across Cline, Roo,
   Continue, OpenCode, Aider. All in [`skills/`](skills/).
 - `tools/check_cache.py` — zero-dep wire-verification tool.

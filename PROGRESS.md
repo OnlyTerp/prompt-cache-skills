@@ -57,8 +57,8 @@ Source recon found bugs but didn't measure hit rates. Pending:
 
 ## Phase 4 — Headline artifact
 
-- [x] `docs/scorecard.md` — 13 harnesses graded per-provider / managed-surface status
-- [x] README → expanded 13-harness scorecard summary table added
+- [x] `docs/scorecard.md` — 13 completed harness audits graded per-provider / managed-surface status; 6 queued stubs excluded
+- [x] README → expanded 13-completed-audit scorecard summary table added
 - [x] Extended capture round — Hermes, Devin, Codex CLI backend, Grok CLI attempts recorded; closed desktop blockers documented
 
 ## Phase 5 — Upstream PRs

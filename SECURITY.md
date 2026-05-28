@@ -6,9 +6,13 @@ This repository contains:
 
 - Documentation (`docs/`, `audits/`, `skills/`) — Markdown content with
   no executable code path.
-- A zero-dependency Python script (`tools/check_cache.py`) that uses
-  only the Python standard library and makes HTTPS calls to the
-  user-configured provider (Anthropic / OpenAI / Gemini).
+- Zero-dependency Python scripts:
+  - `tools/check_cache.py`, which uses only the Python standard library
+    and makes HTTPS calls to the user-configured provider (Anthropic /
+    OpenAI / Gemini).
+  - `tools/check_docs_consistency.py`, which reads local Markdown files
+    and verifies audit counts, README table rows, scorecard links, and
+    local Markdown links.
 - A small Bash wrapper (`tools/audit_harness.sh`).
 
 The scripts do not collect telemetry, do not write outside their
