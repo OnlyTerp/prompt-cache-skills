@@ -1,0 +1,14 @@
+config:
+  default: true
+  # Don't enforce line length on Markdown — diffs and tables blow this.
+  MD013: false
+  # Allow inline HTML (we use it for table layout in some audits).
+  MD033: false
+  # Allow duplicate headings across files (our skills repeat ## Target etc.)
+  MD024:
+    siblings_only: true
+  # First-line H1 not required for SKILL.md files that lead with frontmatter.
+  MD041: false
+ignores:
+  - "skills/_TEMPLATE/**"
+  - "audits/_TEMPLATE.md"

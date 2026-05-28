@@ -194,6 +194,19 @@ We accept new skills, new harness audits, and corrections. See
 [`CONTRIBUTING.md`](CONTRIBUTING.md). The bar is: a captured request
 body + a verified hit-rate change. We don't take vibe submissions.
 
+By participating you agree to our [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## Security
+
+Found something that looks like a credential leak path, a request
+construction bug that leaks user secrets, or any other security
+issue? See [`SECURITY.md`](SECURITY.md) for the disclosure process.
+Don't open a public issue.
+
+## Changelog
+
+Releases tracked in [`CHANGELOG.md`](CHANGELOG.md).
+
 ## License
 
 Skills and audit prose: CC-BY-4.0. Code (`tools/`): MIT.

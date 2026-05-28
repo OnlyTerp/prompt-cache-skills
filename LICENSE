@@ -22,6 +22,7 @@ SOFTWARE.
 
 ----
 
-Audit reports (everything under harnesses/, docs/, and examples/ that is
-prose rather than code) are dual-licensed under CC-BY-4.0 in addition to
-the MIT license above. See https://creativecommons.org/licenses/by/4.0/
+Skills (skills/*.md) and audit/docs prose (everything under audits/,
+docs/, and examples/ that is prose rather than code) are dual-licensed
+under CC-BY-4.0 in addition to the MIT license above. See
+https://creativecommons.org/licenses/by/4.0/
