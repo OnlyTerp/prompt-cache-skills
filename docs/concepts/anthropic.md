@@ -7,13 +7,21 @@
 
 ## TL;DR
 
-Anthropic prompt caching is **explicit and opt-in**. You mark content
-blocks with `cache_control: {"type": "ephemeral"}` and Anthropic caches
-the prefix-up-to-and-including that block. On a subsequent request with
-the same prefix bytes, you pay 0.1x input price on the cached tokens.
+Anthropic prompt caching now has **two modes**:
 
-Without `cache_control`, nothing is cached. There is no automatic prefix
-caching on the Anthropic Messages API.
+1. **Automatic caching** (newer, simpler): pass a top-level
+   `cache_control: {"type": "ephemeral"}` field on the request. Anthropic
+   auto-places the breakpoint on the last cacheable block and moves it
+   forward as the conversation grows. Best for multi-turn agent loops
+   where you don't want to manage breakpoints by hand.
+2. **Explicit breakpoints** (original API, finer control): set
+   `cache_control: {"type": "ephemeral"}` directly on individual content
+   blocks. Up to 4 breakpoints per request. Use when you have multiple
+   logical cache layers (long static doc + tools + history) and want
+   independent invalidation.
+
+Without either, nothing is cached. There is no implicit prefix caching
+on the Anthropic Messages API (unlike OpenAI).
 
 ## Mechanics
 
@@ -54,7 +62,7 @@ Both TTLs are sliding: each read resets the timer.
 |-----------|----------------------------------|
 | Cache write (5min TTL) | 1.25x |
 | Cache write (1h TTL) | 2.0x |
-| Cache read | 0.1x |
+| Cache read / refresh | 0.1x |
 | Uncached input | 1.0x |
 | Output | base output price (unchanged) |
 
@@ -62,6 +70,19 @@ Break-even on a 5min cache: a written block pays for itself after roughly
 2 reads. Above ~3 reads it's strictly cheaper than not caching.
 
 For 1h: roughly 4 reads to break even.
+
+### Actual prices (Claude 4.x family, USD per MTok)
+
+| Model | Base input | 5m write | 1h write | Cache hit |
+|-------|-----------|----------|----------|-----------|
+| Opus 4.7 | $5.00 | $6.25 | $10.00 | $0.50 |
+| Opus 4.6 | $5.00 | $6.25 | $10.00 | $0.50 |
+| Opus 4.5 | $5.00 | $6.25 | $10.00 | $0.50 |
+| Opus 4.1 | $15.00 | $18.75 | $30.00 | $1.50 |
+| Sonnet 4.6 | $3.00 | $3.75 | $6.00 | $0.30 |
+
+(Verified against Anthropic pricing page 2026-05-27. Older Sonnet/Haiku
+not listed but follow the same 1.25x/2.0x/0.1x ratios.)
 
 ## Request shape
 

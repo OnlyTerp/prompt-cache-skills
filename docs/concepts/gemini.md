@@ -22,20 +22,32 @@ implicit isn't available.
 
 ### Model support
 
+- Gemini 3.5 Flash: enabled by default
+- Gemini 3 Pro Preview: enabled by default
 - Gemini 2.5 Pro: enabled by default
 - Gemini 2.5 Flash: enabled by default
-- Older models: not supported
+- Older (1.x, 2.0) models: not supported
 
 ### Mechanics
 
 Automatic. Google's infrastructure detects repeated prefixes and serves
 them from a fast path. No API parameter to enable or disable.
 
-### Minimums
+### Minimums (verified 2026-05-27 against ai.google.dev docs)
 
-Implicit caching engages above a threshold (~4096 tokens for Flash,
-~32k for Pro — verify current). Below threshold, no caching, no API
-error, just no `cachedContentTokenCount` in the response.
+| Model | Min tokens for implicit cache |
+|-------|------------------------------|
+| Gemini 3.5 Flash | 1024 |
+| Gemini 3 Pro Preview | 4096 |
+| Gemini 2.5 Flash | 1024 |
+| Gemini 2.5 Pro | 4096 |
+
+Below threshold, no caching, no API error, just no
+`cachedContentTokenCount` in the response.
+
+To increase the chance of an implicit cache hit, Google explicitly
+recommends: (a) put large/common content at the start of the prompt,
+(b) send requests with similar prefixes close together in time.
 
 ### Pricing
 
@@ -93,8 +105,8 @@ Two-step:
 
 ### Minimums
 
-- Gemini 2.5 Pro: 4096 tokens minimum
-- Gemini 2.5 Flash: 1024 tokens minimum
+Same as implicit caching minimums (see table above): 1024 tokens for
+Flash variants, 4096 for Pro variants.
 
 Below the minimum, `cachedContents.create()` returns a 400. Verify by
 inspecting `cached.usage_metadata.total_token_count` after creation.
@@ -158,4 +170,7 @@ cached, not the file reference.
 
 ---
 
-_Last verified against Gemini docs: TODO_
+_Last verified against Gemini docs: 2026-05-27. Min token counts for
+3.5/3.0/2.5 Pro/Flash families verified against ai.google.dev/gemini-api/docs/caching.
+Default explicit-cache TTL is 1 hour. Implicit caching has "no cost
+saving guarantee" per Google — pricing benefit is best-effort._
