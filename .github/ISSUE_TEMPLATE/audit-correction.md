@@ -6,7 +6,7 @@ labels: correction
 
 ## Audit being corrected
 
-- File: `harnesses/<slug>.md`
+- File: `audits/<slug>.md`
 - Audited commit (per current file):
 - Current commit of the harness:
 

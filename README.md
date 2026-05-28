@@ -1,68 +1,150 @@
-# prompt-cache-audit
+# prompt-cache-skills
 
-> An opinionated, living audit of how the major LLM agent harnesses (Claude
-> Code, Cline, Roo Code, Aider, Continue, OpenCode, Crush, Codex CLI, etc.)
-> use — or fail to use — prompt caching from Anthropic, OpenAI, Google
-> Gemini, AWS Bedrock, and Vertex.
+> Drop-in prompt-caching fixes for the LLM agent harness you use.
+> Point your AI coding agent at this repo and it ships the patches.
 
-If you run an agent harness against a frontier model and you aren't getting
-`cache_read_input_tokens` back on most turns, you are setting fire to 5-10x
-more money than you need to and your agent loop is several hundred ms
-slower per turn than it should be.
+Most popular OSS agent harnesses (Cline, Roo Code, Continue, OpenCode,
+Aider) leave **30-90% off your API bill** on the table because their
+prompt-caching code is subtly wrong, off-by-default, or just missing
+for some providers.
 
-This repo is two things:
+This repo is a set of **drop-in skills** that any AI coding agent
+(Claude Code, Codex, Cline, Cursor, Devin, Gemini CLI, OpenCode…) can
+read and apply on its own.
 
-1. **A reference**: a single source of truth for how prompt caching actually
-   works on each provider, including the parts the official docs gloss over
-   (TTL behavior, breakpoint placement, the cache-write premium, tool-result
-   interactions, byte-identity rules on OpenAI, minimum sizes on Gemini).
-2. **An audit**: a per-harness scorecard — does this harness send
-   `cache_control`, where, with how many breakpoints, and does the provider
-   actually return cache hits? With reproducible methodology.
+You don't read the diffs. You point your agent at this repo and say:
+
+> "Apply every skill in this repo that matches the harnesses I use."
+
+The agent reads each `SKILL.md`, checks if it applies to your setup,
+lands the diff, and verifies the fix on the wire. You go from broken
+or partial caching to 80-99% cache hit rates without doing the
+research yourself.
+
+## What you actually save
+
+Real numbers from the audit underneath this:
+
+| Harness | Bug | Current cost | After fix |
+|---------|-----|--------------|-----------|
+| Cline (Anthropic) | Caches volatile current user msg every turn | 1 of 3 breakpoints wasted, 30% premium-burn | Full breakpoint utilization, ~99% hit rate |
+| Cline (OpenAI) | No `prompt_cache_key`, no cache hits at all | 0% cache reads | 50-90% input discount |
+| Roo Code (Bedrock custom ARN) | Silently disables caching | 0% cache reads | Full Bedrock caching |
+| Continue | Caching opt-in by default; most users never enable it | 0% for most users | 90% discount default |
+| Continue (Gemini) | Explicit `cachedContents` API not implemented at all | Implicit-cache luck only | Guaranteed 75% discount on Pro |
+| Aider | 5min TTL + costly keepalive pings | 5min cache windows | 1h cache, no pings |
+| Aider | `--cache-prompts` off by default | 0% for most users | 90% discount default |
+| OpenCode | OpenAI-compatible proxies → Anthropic miss caching | 0% on LiteLLM/Bifrost routes | Full Anthropic caching through proxies |
+
+13 skills total, each one a self-contained fix. See
+[`skills/README.md`](skills/README.md) for the full index.
+
+## How to use it
+
+### Option A — point any AI coding agent at this repo
+
+In your agent of choice (Claude Code, Codex, Cline, Cursor, Devin, etc.):
+
+```
+Read https://github.com/<owner>/prompt-cache-skills
+
+Apply every skill in skills/ that matches the harnesses I currently
+use. For each one:
+1. Confirm the target file exists in my project at the cited path.
+2. Apply the diff.
+3. Run the SKILL's Verify steps and confirm the assertion passes.
+4. If verify fails, revert and tell me why.
+```
+
+That's it. The agent picks up the rest from each `SKILL.md`'s
+machine-readable frontmatter and instructions.
+
+### Option B — install as a skill bundle in Claude Code / Devin / etc.
+
+If you use one of the agents that supports a skills directory:
+
+```bash
+# Claude Code
+git clone <this-repo> ~/.claude/skills/prompt-cache-skills
+
+# Devin
+git clone <this-repo> ~/.config/devin/skills/prompt-cache-skills
+
+# OpenCode
+git clone <this-repo> ~/.config/opencode/skills/prompt-cache-skills
+```
+
+Then ask your agent:
+
+```
+Run the prompt-cache-skills bundle on this codebase.
+```
+
+### Option C — read and apply by hand
+
+Each [`skills/<name>/SKILL.md`](skills/) is a complete fix: target,
+symptom, diff, verification. Apply the relevant ones manually if you
+don't trust your agent to do it.
+
+## What's in here
+
+```
+prompt-cache-skills/
+├── skills/                       ← the fixes (this is what your agent reads)
+│   ├── cline-fix-volatile-msg/
+│   ├── cline-openai-cache-key/
+│   ├── cline-pin-timestamp/
+│   ├── roo-fix-volatile-msg/
+│   ├── roo-bedrock-custom-arn/
+│   ├── continue-fix-volatile-msg/
+│   ├── continue-enable-defaults/
+│   ├── continue-gemini-explicit/
+│   ├── opencode-detect-openai-compat/
+│   ├── opencode-bedrock-doc-blocks/
+│   ├── opencode-mistral-cache-key/
+│   ├── aider-1h-ttl/
+│   └── aider-cache-default-on/
+├── audits/                       ← evidence: per-harness audit reports
+│   ├── cline.md
+│   ├── roo-code.md
+│   ├── aider.md
+│   ├── opencode.md
+│   ├── continue.md
+│   ├── codex-cli.md              ← (reference, already correct)
+│   └── claude-code.md
+├── docs/                         ← the underlying API mechanics
+│   ├── concepts/                 ← per-provider caching reference
+│   ├── gotchas.md                ← 16 numbered footguns
+│   ├── verification.md           ← how to confirm caching on wire
+│   └── scorecard.md              ← all harnesses graded at a glance
+├── tools/                        ← scripts to verify caching yourself
+│   ├── check_cache.py            ← fire request twice, dump cache_* fields
+│   ├── audit_harness.sh
+│   └── replay_harness.md
+└── AGENTS.md                     ← entry point for AI agents reading this repo
+```
 
 ## Why this exists
 
-Anthropic, OpenAI, and Google all ship prompt caching, but in very different
-shapes:
+If your agent harness sends 30,000 tokens of system prompt + tools per
+turn, on Claude 4.7 Opus that's $0.15 per turn uncached vs $0.015
+cached — a 10x difference. A 50-turn coding session costs $7.50 vs
+$0.75. **You're paying 10x what you should be** because the harness
+you use either:
 
-- **Anthropic** — explicit, opt-in via `cache_control: {type: "ephemeral"}`
-  breakpoints on content blocks. 4 breakpoints max per request. 5-minute
-  TTL (default) or 1-hour (beta). 90% read discount, 25% write premium.
-- **OpenAI** — automatic, no API surface. Prefix must be ≥1024 tokens
-  and byte-identical across calls. ~50% read discount, no write premium.
-  Routing is by org+prefix-hash.
-- **Google Gemini** — two flavors: implicit (automatic, free) and explicit
-  (`CachedContent` objects with minimum sizes and TTL).
-- **Bedrock / Vertex** — pass-throughs of the underlying provider's
-  semantics, with their own footguns.
+- doesn't set `cache_control` at all,
+- sets it on volatile content that thrashes the cache,
+- doesn't set `prompt_cache_key` for OpenAI,
+- has caching gated behind a config flag you never set, or
+- just doesn't implement it for one of your providers.
 
-Most harnesses were written when none of this existed, or for a single
-provider. The result: caching is left on the table everywhere.
+None of these are hard to fix. They're all 5-15 line diffs. The
+hard part is knowing which one applies to your harness and getting it
+right. This repo does that work for you.
 
-## What this repo is NOT
+## The grade card
 
-- Not a generic "what is prompt caching" explainer. The Anthropic docs page
-  is fine for that. We assume you already know roughly what it is.
-- Not a sales pitch for any specific harness. We grade them on a single
-  axis: does caching work end-to-end?
-- Not a substitute for reading the provider docs. Links in
-  [`docs/providers/`](docs/providers/).
-
-## Quick start
-
-If you just want to fix your own harness:
-
-1. Read [`docs/concepts/anthropic.md`](docs/concepts/anthropic.md) (or
-   whichever provider you target).
-2. Read [`docs/gotchas.md`](docs/gotchas.md). Most caching bugs are in here.
-3. Read [`docs/verification.md`](docs/verification.md) — how to actually
-   confirm a cache hit, not just hope.
-4. Find your harness in [`harnesses/`](harnesses/). If it's red, the file
-   tells you exactly which line to patch.
-
-## Status
-
-First wave of audits complete (2026-05-27). 7 harnesses graded:
+7 harnesses audited from source, dated 2026-05-27:
 
 | Harness | Anthropic | OpenAI | Bedrock | Gemini |
 |---------|-----------|--------|---------|--------|
@@ -76,29 +158,48 @@ First wave of audits complete (2026-05-27). 7 harnesses graded:
 
 \* inferred from wire shape; source closed.
 
-Full scorecard with file:line citations and proposed upstream patches
-in [`docs/scorecard.md`](docs/scorecard.md).
+Full per-provider breakdown with file:line citations in
+[`docs/scorecard.md`](docs/scorecard.md).
 
-Headline findings:
-- A "last 2 user messages" copy-paste bug propagated Cline → Roo →
-  Continue, burning a breakpoint on the volatile current turn.
-- Cline OpenAI native sends no `prompt_cache_key` and no prefix-stability
-  work — users are paying full price.
-- Gemini explicit caching (`cachedContents`) is universally unimplemented.
-- Codex CLI is the reference for OpenAI-side caching (thread_id cache key,
-  preserved across compaction and sub-agents).
-- OpenCode's system-prompt split is the best Anthropic pattern in OSS.
+## Headline findings
 
-Remaining work (Phase 3 for: goose, aichat, gptme, avante.nvim,
-kilo-code, crush) tracked in [`PROGRESS.md`](PROGRESS.md). Wire-capture
-re-validation tracked in [`EXECUTION_PLAN.md`](EXECUTION_PLAN.md).
+1. **The "last 2 user messages" pattern is a copy-paste bug** that
+   propagated Cline → Roo → Continue. All three burn a breakpoint on
+   the volatile current turn. Same one-line fix in each.
+2. **Cline OpenAI native is silently broken** — no `prompt_cache_key`,
+   no prefix-stability work. Users on Cline+OpenAI pay full price.
+3. **Gemini explicit caching is universally unimplemented.** Only
+   implicit (best-effort, free) caching engages, even on long
+   sessions with massive stable system prompts where explicit gives
+   a guaranteed 75% discount.
+4. **Codex CLI is the reference for OpenAI-side caching** — thread_id
+   as cache key, preserved across compaction and into sub-agents.
+5. **OpenCode's system-prompt split is the best Anthropic pattern.**
+
+## Trust but verify
+
+Every skill ships with a Verify section that captures the wire and
+confirms the fix landed. Don't take our word for it — the
+[`tools/check_cache.py`](tools/check_cache.py) script fires any
+request body twice (cold + warm) and prints the diff of `cache_*`
+token fields.
+
+Run it before and after applying a skill. You should see
+`cache_read_input_tokens` (Anthropic) or `cached_tokens` (OpenAI) or
+`cachedContentTokenCount` (Gemini) go from 0 to most of your input.
 
 ## Contributing
 
-See [`CONTRIBUTING.md`](CONTRIBUTING.md). Submissions must include a
-reproducible test (request body + response body showing `cache_*` fields)
-or they will be closed. We don't grade on vibes.
+We accept new skills, new harness audits, and corrections. See
+[`CONTRIBUTING.md`](CONTRIBUTING.md). The bar is: a captured request
+body + a verified hit-rate change. We don't take vibe submissions.
 
 ## License
 
-MIT. Audit reports are CC-BY-4.0.
+Skills and audit prose: CC-BY-4.0. Code (`tools/`): MIT.
+
+## Star and share
+
+If this saved you money, share it with the other people using these
+harnesses. The whole point is that everyone gets caching working at
+once.

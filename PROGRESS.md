@@ -28,19 +28,19 @@
 
 Priority order:
 
-- [x] `harnesses/claude-code.md` — inferred; closed source
-- [x] `harnesses/cline.md` — partial; volatile-msg bug; OpenAI broken
-- [x] `harnesses/roo-code.md` — partial; same Anthropic bug; Bedrock custom ARN gap
-- [x] `harnesses/aider.md` — working with `--cache-prompts`; 1h TTL gap
-- [x] `harnesses/opencode.md` — working on Anthropic; OpenAI-compatible→Anthropic broken
-- [x] `harnesses/codex-cli.md` — working; reference implementation for OpenAI
-- [x] `harnesses/continue.md` — partial; opt-in; Gemini missing
-- [ ] `harnesses/crush.md`
-- [ ] `harnesses/goose.md`
-- [ ] `harnesses/aichat.md`
-- [ ] `harnesses/gptme.md`
-- [ ] `harnesses/avante-nvim.md`
-- [ ] `harnesses/kilo-code.md`
+- [x] `audits/claude-code.md` — inferred; closed source
+- [x] `audits/cline.md` — partial; volatile-msg bug; OpenAI broken
+- [x] `audits/roo-code.md` — partial; same Anthropic bug; Bedrock custom ARN gap
+- [x] `audits/aider.md` — working with `--cache-prompts`; 1h TTL gap
+- [x] `audits/opencode.md` — working on Anthropic; OpenAI-compatible→Anthropic broken
+- [x] `audits/codex-cli.md` — working; reference implementation for OpenAI
+- [x] `audits/continue.md` — partial; opt-in; Gemini missing
+- [ ] `audits/crush.md`
+- [ ] `audits/goose.md`
+- [ ] `audits/aichat.md`
+- [ ] `audits/gptme.md`
+- [ ] `audits/avante-nvim.md`
+- [ ] `audits/kilo-code.md`
 
 ### Wire-capture re-validation (TODO for any of the above)
 
@@ -72,4 +72,4 @@ here:
 - When auditing a harness, commit the audit file + example req/report
   together. Don't batch multiple harnesses in one commit.
 - If you discover a new harness worth auditing, add it as a stub via
-  `harnesses/_TEMPLATE.md` and append it to Phase 3 above.
+  `audits/_TEMPLATE.md` and append it to Phase 3 above.

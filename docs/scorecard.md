@@ -9,12 +9,12 @@
 
 | Harness | Sets `cache_control`? | Breakpoints | TTL | Volatile-msg bug? | Verdict | Audit |
 |---------|----------------------|-------------|-----|-------------------|---------|-------|
-| Claude Code | yes (inferred) | 3 (system, tools, last) | 5min | no (inferred) | **working** | [`../harnesses/claude-code.md`](../harnesses/claude-code.md) |
-| OpenCode | yes | 4 (system×2 split, last 2 msgs) | 5min / 1h flag | partial | **working** | [`../harnesses/opencode.md`](../harnesses/opencode.md) |
-| Aider | yes (--cache-prompts) | 4 (system, repo-map, files, current) | 5min | no | **working** | [`../harnesses/aider.md`](../harnesses/aider.md) |
-| Cline | yes | 3 (system, last 2 user msgs) | 5min | **yes** | **partial** | [`../harnesses/cline.md`](../harnesses/cline.md) |
-| Roo Code | yes | 3 (system, last 2 user msgs) | 5min | **yes** | **partial** | [`../harnesses/roo-code.md`](../harnesses/roo-code.md) |
-| Continue | yes (config-gated, off by default) | 3 (system, last 2 user msgs) | 5min | **yes** | **partial** | [`../harnesses/continue.md`](../harnesses/continue.md) |
+| Claude Code | yes (inferred) | 3 (system, tools, last) | 5min | no (inferred) | **working** | [`../audits/claude-code.md`](../audits/claude-code.md) |
+| OpenCode | yes | 4 (system×2 split, last 2 msgs) | 5min / 1h flag | partial | **working** | [`../audits/opencode.md`](../audits/opencode.md) |
+| Aider | yes (--cache-prompts) | 4 (system, repo-map, files, current) | 5min | no | **working** | [`../audits/aider.md`](../audits/aider.md) |
+| Cline | yes | 3 (system, last 2 user msgs) | 5min | **yes** | **partial** | [`../audits/cline.md`](../audits/cline.md) |
+| Roo Code | yes | 3 (system, last 2 user msgs) | 5min | **yes** | **partial** | [`../audits/roo-code.md`](../audits/roo-code.md) |
+| Continue | yes (config-gated, off by default) | 3 (system, last 2 user msgs) | 5min | **yes** | **partial** | [`../audits/continue.md`](../audits/continue.md) |
 
 ## OpenAI providers (Responses API + Chat Completions)
 
@@ -23,12 +23,12 @@ and whether they set `prompt_cache_key` to a stable value.
 
 | Harness | `prompt_cache_key` set? | Stable hash or UUID? | Prefix byte-stable? | Verdict | Audit |
 |---------|------------------------|----------------------|---------------------|---------|-------|
-| Codex CLI | yes | stable (`thread_id`) | yes (`base_instructions`) | **working** | [`../harnesses/codex-cli.md`](../harnesses/codex-cli.md) |
-| Aider | n/a (Chat Completions; auto) | n/a | yes (no timestamp pollution) | **automatic** | [`../harnesses/aider.md`](../harnesses/aider.md) |
-| Roo Code | yes | stable (sha256 of system + first msg) | yes | **working** | [`../harnesses/roo-code.md`](../harnesses/roo-code.md) |
-| OpenCode | yes | unverified (likely stable) | yes (with system split) | **working** | [`../harnesses/opencode.md`](../harnesses/opencode.md) |
-| Continue | no | n/a | unverified | **partial** | [`../harnesses/continue.md`](../harnesses/continue.md) |
-| Cline | **no** | n/a | unverified | **broken** | [`../harnesses/cline.md`](../harnesses/cline.md) |
+| Codex CLI | yes | stable (`thread_id`) | yes (`base_instructions`) | **working** | [`../audits/codex-cli.md`](../audits/codex-cli.md) |
+| Aider | n/a (Chat Completions; auto) | n/a | yes (no timestamp pollution) | **automatic** | [`../audits/aider.md`](../audits/aider.md) |
+| Roo Code | yes | stable (sha256 of system + first msg) | yes | **working** | [`../audits/roo-code.md`](../audits/roo-code.md) |
+| OpenCode | yes | unverified (likely stable) | yes (with system split) | **working** | [`../audits/opencode.md`](../audits/opencode.md) |
+| Continue | no | n/a | unverified | **partial** | [`../audits/continue.md`](../audits/continue.md) |
+| Cline | **no** | n/a | unverified | **broken** | [`../audits/cline.md`](../audits/cline.md) |
 
 ## Bedrock (Anthropic models via Converse API)
 
@@ -37,10 +37,10 @@ hardcode `cache_control` will silently not cache here.
 
 | Harness | Uses `cachePoint` correctly? | Custom ARN handling | Verdict | Audit |
 |---------|------------------------------|---------------------|---------|-------|
-| OpenCode | yes (broken on DocumentBlocks #17300) | n/a | **partial** | [`../harnesses/opencode.md`](../harnesses/opencode.md) |
-| Continue | yes | n/a | **partial** | [`../harnesses/continue.md`](../harnesses/continue.md) |
-| Cline | yes (but gated, incomplete impl) | n/a | **unverified** | [`../harnesses/cline.md`](../harnesses/cline.md) |
-| Roo Code | yes for declared models | **broken** for custom ARNs (#11983) | **partial** | [`../harnesses/roo-code.md`](../harnesses/roo-code.md) |
+| OpenCode | yes (broken on DocumentBlocks #17300) | n/a | **partial** | [`../audits/opencode.md`](../audits/opencode.md) |
+| Continue | yes | n/a | **partial** | [`../audits/continue.md`](../audits/continue.md) |
+| Cline | yes (but gated, incomplete impl) | n/a | **unverified** | [`../audits/cline.md`](../audits/cline.md) |
+| Roo Code | yes for declared models | **broken** for custom ARNs (#11983) | **partial** | [`../audits/roo-code.md`](../audits/roo-code.md) |
 
 ## Gemini
 
@@ -50,7 +50,7 @@ the API.
 
 | Harness | Uses `cachedContents`? | Implicit cache OK? | Verdict | Audit |
 |---------|-----------------------|--------------------|---------|-------|
-| Continue | **no** | yes (no prefix pollution) | **broken** (explicit) / **automatic** (implicit) | [`../harnesses/continue.md`](../harnesses/continue.md) |
+| Continue | **no** | yes (no prefix pollution) | **broken** (explicit) / **automatic** (implicit) | [`../audits/continue.md`](../audits/continue.md) |
 
 (Other harnesses don't ship Gemini support, or do via OpenRouter
 passthrough — which is rated under the Anthropic column above when
@@ -64,9 +64,9 @@ Top-level `prompt_cache_ttl` is silently dropped (OpenCode #16848).
 
 | Harness | OpenRouter Anthropic | OpenRouter Gemini | Verdict | Audit |
 |---------|---------------------|-------------------|---------|-------|
-| OpenCode | yes (content-level ttl) | yes (PR #20266 Vertex) | **working** | [`../harnesses/opencode.md`](../harnesses/opencode.md) |
-| Roo Code | yes (delegates via transform module) | yes | **working** | [`../harnesses/roo-code.md`](../harnesses/roo-code.md) |
-| Cline | yes (Anthropic + MiniMax detected) | unverified | **partial** | [`../harnesses/cline.md`](../harnesses/cline.md) |
+| OpenCode | yes (content-level ttl) | yes (PR #20266 Vertex) | **working** | [`../audits/opencode.md`](../audits/opencode.md) |
+| Roo Code | yes (delegates via transform module) | yes | **working** | [`../audits/roo-code.md`](../audits/roo-code.md) |
+| Cline | yes (Anthropic + MiniMax detected) | unverified | **partial** | [`../audits/cline.md`](../audits/cline.md) |
 
 ## Headline findings
 

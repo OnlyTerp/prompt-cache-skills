@@ -4,7 +4,7 @@
 
 PRs must include:
 
-1. The audit file at `harnesses/<slug>.md` filled in per the template.
+1. The audit file at `audits/<slug>.md` filled in per the template.
 2. A captured request body at `examples/<slug>-req.json` (sanitized of
    secrets and PII).
 3. The `check_cache.py` report output at `examples/<slug>-report.json`.
@@ -16,7 +16,7 @@ vibes.
 
 ## Adding a new harness
 
-1. Copy `harnesses/_TEMPLATE.md` to `harnesses/<slug>.md`.
+1. Copy `audits/_TEMPLATE.md` to `audits/<slug>.md`.
 2. Add the slug to `docs/scorecard.md` (or whichever index file exists).
 3. Follow the audit methodology in `docs/verification.md`.
 
