@@ -40,7 +40,7 @@ Priority order:
 - [x] `audits/devin-cli.md` — unverified; raw CLI captured as opaque Codeium/Devin Connect protobuf
 - [x] `audits/windsurf-cascade.md` — unverified; closed desktop, no one-shot model capture
 - [x] `audits/antigravity.md` — unverified; closed desktop, no model capture
-- [x] `audits/grok-cli.md` — unverified; CLI answered but model call did not hit mitmproxy
+- [x] `audits/grok-cli.md` — working; versioned CLI chat proxy returned non-zero `prompt_tokens_details.cached_tokens`
 - [ ] `audits/crush.md`
 - [ ] `audits/goose.md`
 - [ ] `audits/aichat.md`

@@ -55,7 +55,7 @@ One row per completed audit, so the coverage matches the scorecard:
 | Devin CLI | Raw CLI model path is opaque Codeium/Devin protobuf | Cache behavior not inspectable from public CLI capture | No skill; unverified managed backend |
 | Windsurf / Cascade | Closed desktop; model turn not captured from CLI | Cache behavior unverified | No skill; needs desktop capture |
 | Antigravity | Closed desktop; no model turn captured | Cache behavior unverified | No skill; needs desktop capture |
-| Grok CLI | CLI answered, but model call did not hit mitmproxy | Cache behavior unverified | No skill; needs transport-aware capture |
+| Grok CLI | Documented CLI chat proxy returns non-zero `prompt_tokens_details.cached_tokens` with real CLI headers | Already gets xAI cache benefits through managed proxy | No skill; working managed proxy |
 
 13 skills total cover the verified patchable OSS bugs. See
 [`skills/README.md`](skills/README.md) for the full index.
@@ -213,7 +213,7 @@ right. This repo does that work for you.
 | Devin CLI | n/a | n/a | n/a | n/a | unverified (opaque protobuf) |
 | Windsurf / Cascade | n/a | n/a | n/a | n/a | unverified (desktop not captured) |
 | Antigravity | n/a | n/a | n/a | unverified | unverified (desktop not captured) |
-| Grok CLI | n/a | n/a | n/a | n/a | unverified (model call not captured) |
+| Grok CLI | n/a | n/a | n/a | n/a | **working (xAI CLI proxy cached tokens)** |
 
 \* RE-backed or inferred from captured/companion wire shape where public source is unavailable; see the linked audit for caveats.
 
@@ -243,9 +243,10 @@ Full per-provider breakdown with file:line citations in
 6. **Hermes / Nous has real multi-provider cache plumbing** — source
    covers Anthropic/OpenRouter/Nous/Qwen and xAI wire capture showed
    `prompt_cache_key`, `x-grok-conv-id`, and non-zero cached tokens.
-7. **Closed managed surfaces need transport-aware capture.** Devin,
-   Windsurf, Antigravity, and Grok CLI are marked unverified where the
-   model channel was protobuf, desktop-only, or proxy-invisible.
+7. **Closed managed surfaces need transport-aware capture.** Grok CLI
+   now verifies through its versioned chat proxy with non-zero cached
+   tokens; Devin remains protobuf, while Windsurf and Antigravity still
+   need desktop-driven captures.
 
 ---
 

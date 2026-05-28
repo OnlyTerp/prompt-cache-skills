@@ -44,7 +44,7 @@
 
     <line x1="20" y1="132" x2="780" y2="132" stroke="#1e3a2f" stroke-width="0.5"/>
 
-    <text x="20" y="143" font-family="'Segoe UI', system-ui, sans-serif" font-size="10" fill="#6ee7b7" font-style="italic">Also working: Codex CLI (OpenAI reference impl) · Codex Desktop (inferred) · Hermes/Nous (multi-provider + xAI verified)</text>
+    <text x="20" y="143" font-family="'Segoe UI', system-ui, sans-serif" font-size="10" fill="#6ee7b7" font-style="italic">Also working: Codex CLI (OpenAI reference impl) · Codex Desktop (inferred) · Hermes/Nous · Grok CLI (xAI proxy cached tokens)</text>
   </g>
 
   <!-- TIER 2: Needs Fixes -->
@@ -98,10 +98,10 @@
     <text x="20" y="110" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="500" fill="#cbd5e1">Antigravity</text>
     <text x="215" y="110" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#64748b">Desktop-only — no local provider source captured</text>
 
-    <text x="540" y="58" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="500" fill="#cbd5e1">Grok CLI</text>
-    <text x="540" y="84" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#64748b">Model call didn't hit</text>
-    <text x="540" y="100" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#64748b">mitmproxy — needs</text>
-    <text x="540" y="116" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#64748b">transport-aware capture</text>
+    <text x="540" y="58" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="500" fill="#86efac">Grok CLI</text>
+    <text x="540" y="84" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#94a3b8">CLI proxy verified</text>
+    <text x="540" y="100" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#94a3b8">cached_tokens via</text>
+    <text x="540" y="116" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#94a3b8">versioned headers</text>
   </g>
 
   <!-- Border -->

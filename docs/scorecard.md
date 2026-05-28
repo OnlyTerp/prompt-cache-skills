@@ -83,7 +83,7 @@ Top-level `prompt_cache_ttl` is silently dropped (OpenCode #16848).
 |---------|-------------------------|-----------------|---------|-------|
 | Hermes / Nous | yes: `prompt_cache_key` + `x-grok-conv-id` on xAI `/v1/responses` | yes: `input_tokens_details.cached_tokens` | **working** | [`../audits/hermes-nous.md`](../audits/hermes-nous.md) |
 | Codex Desktop | yes (inferred): `session_id` + `x-client-request-id` on ChatGPT Codex backend | no successful usage block in captured run | **working (inferred)** | [`../audits/codex-desktop.md`](../audits/codex-desktop.md) |
-| Grok CLI | no model call captured; only update checks reached mitmproxy | no | **unverified** | [`../audits/grok-cli.md`](../audits/grok-cli.md) |
+| Grok CLI | yes: documented CLI chat proxy with real `x-grok-client-version` header | yes: `prompt_tokens_details.cached_tokens` | **working** | [`../audits/grok-cli.md`](../audits/grok-cli.md) |
 | Devin CLI | opaque Codeium/Devin Connect protobuf | no provider cache fields visible | **unverified** | [`../audits/devin-cli.md`](../audits/devin-cli.md) |
 | Windsurf / Cascade | desktop turn not captured from CLI | no | **unverified** | [`../audits/windsurf-cascade.md`](../audits/windsurf-cascade.md) |
 | Antigravity | desktop turn not captured; no local provider source | no | **unverified** | [`../audits/antigravity.md`](../audits/antigravity.md) |
@@ -131,9 +131,10 @@ Top-level `prompt_cache_ttl` is silently dropped (OpenCode #16848).
    non-zero `cached_tokens`.
 
 9. **Managed desktop/CLI surfaces need transport-specific capture.**
-   Devin raw CLI is protobuf, Grok CLI's model call did not hit the HTTP
-   proxy, and Windsurf/Antigravity require desktop-driven captures. These
-   are explicitly unverified rather than graded by guesswork.
+   Grok CLI required its documented chat proxy plus the real CLI version
+   header before usage appeared; that path now verifies cached tokens.
+   Devin raw CLI remains protobuf, and Windsurf/Antigravity still require
+   desktop-driven captures rather than guesswork.
 
 ## Recommended ranking (best to worst for typical Anthropic-targeted use)
 
