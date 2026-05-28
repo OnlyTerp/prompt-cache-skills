@@ -23,6 +23,8 @@ config:
   MD031: false
   # Emphasis-as-heading is fine for our "Last verified:" footnotes.
   MD036: false
+  # Table column style: our consistency checker expects compact separators.
+  MD060: false
 ignores:
   - "skills/_TEMPLATE/**"
   - "audits/_TEMPLATE.md"
