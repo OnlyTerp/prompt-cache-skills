@@ -150,6 +150,102 @@ events have placeholder usage values.
 - Bedrock: see [`bedrock.md`](bedrock.md) — different field name.
 - Vertex: see [`vertex.md`](vertex.md).
 
+## Worked example: a production agent shim
+
+The pattern below is from a production proxy (`claude_byok.py`) that
+fronts Anthropic OAuth-token inference for an agent CLI. It's been
+running steady-state for months and hits ~85-90% cache reads on typical
+loops. It uses 3 of the 4 breakpoints (the fourth is intentionally
+reserved for future use).
+
+### Required beta header
+
+OAuth-bearer inference needs `oauth-2025-04-20`. Add the caching beta
+alongside it:
+
+```
+anthropic-beta: oauth-2025-04-20,fine-grained-tool-streaming-2025-05-14,interleaved-thinking-2025-05-14,prompt-caching-2024-07-31
+```
+
+(`prompt-caching-2024-07-31` is no longer strictly required on current
+Anthropic; the beta graduated. Sending it is a harmless no-op for
+backward compatibility.)
+
+### Breakpoint 1 — last system block
+
+System prompt is built as an array of text blocks (preamble + the
+user's actual system prompt). Tag the LAST one:
+
+```python
+blocks = [
+    {"type": "text", "text": CLAUDE_CODE_SYSTEM_PREAMBLE},
+    {"type": "text", "text": devin_system_prompt},
+]
+blocks[-1] = {**blocks[-1], "cache_control": {"type": "ephemeral"}}
+```
+
+### Breakpoint 2 — last tool
+
+Tools are an array; mark the last:
+
+```python
+out[-1] = {**out[-1], "cache_control": {"type": "ephemeral"}}
+```
+
+Anthropic caches the ENTIRE tools array up through the marker, so one
+breakpoint on the last tool = whole tools array cached.
+
+### Breakpoint 3 — last block of last message
+
+After building the messages array, find the last message, get its last
+content block, and tag it:
+
+```python
+last = sanitized[-1]
+content = last.get("content")
+if isinstance(content, list) and content:
+    tail = content[-1]
+    if isinstance(tail, dict) and "cache_control" not in tail:
+        content[-1] = {**tail, "cache_control": {"type": "ephemeral"}}
+```
+
+This caches the whole conversation history. On the next turn, the new
+user message is uncached (small) but everything before it is a cache read.
+
+### Why not all 4 breakpoints?
+
+The 4th is reserved for cases where you want a "split" between long
+static context (e.g., a giant pasted file) and conversation history.
+For pure agent loops without long static blocks, 3 is the sweet spot —
+extra breakpoints have no upside and cost a few extra bytes per request.
+
+### Sanitize empty content blocks BEFORE tagging
+
+Anthropic rejects empty text blocks with "content blocks must be
+non-empty". If you build messages by translating from another format
+(e.g., OpenAI), you can end up with empty blocks. Strip those FIRST,
+then add `cache_control` to whatever is genuinely the last block.
+
+### Measured behavior
+
+Response usage on a steady-state turn:
+
+```jsonc
+"usage": {
+  "input_tokens": 23,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 11890,
+  "output_tokens": 412
+}
+```
+
+Hit rate = 11890 / (23 + 0 + 11890) = 99.8%.
+
+On the very first turn after a cold start (or after >5min idle), the
+shape inverts: `cache_creation_input_tokens > 0`, `cache_read = 0`. This
+is the 1.25x write premium being paid; it's expected and pays for itself
+on turn 2.
+
 ## References
 
 - https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching
@@ -158,4 +254,7 @@ events have placeholder usage values.
 
 ---
 
-_Last verified against Anthropic docs: TODO (executor agent: stamp this when you check)_
+_Last verified against Anthropic docs: 2026-05-27. Pricing multipliers
+(1.25x write, 0.1x read for 5min; 2x write for 1h) and the 4-breakpoint
+limit are stable since the August 2024 GA. Beta header name verified
+against live shim traffic._

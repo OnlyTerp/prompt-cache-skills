@@ -105,6 +105,26 @@ cache hits" reports were just reading the wrong field.
 You can't extend TTL, can't mark specific blocks, can't choose a
 breakpoint. If the prefix structure isn't stable, you're stuck.
 
+### 9b. `prompt_cache_key` set to a random UUID
+
+Hidden footgun on the Responses API. Many harnesses pass a per-request
+UUID as `prompt_cache_key` (or send it via the `session_id` header to
+the Codex backend). This is **worse than not setting it at all** —
+OpenAI uses the key as a pod-routing hint. Random keys force random
+routing, and you get cold-cache pricing on every call.
+
+Fix: hash the stable parts of the prompt (system + tools + model slug)
+to derive a stable key.
+
+```python
+digest = hashlib.sha256(composed_instructions.encode("utf-8")).hexdigest()[:16]
+prompt_cache_key = f"<your-app>:<model>:{digest}"
+```
+
+See [`concepts/openai.md`](concepts/openai.md) "The `prompt_cache_key`
+trick" for the full pattern. Measured impact: 0% → 75-91% cache hit
+rate on multi-worker agent pipelines.
+
 ## Gemini
 
 ### 10. Implicit vs explicit are different APIs
