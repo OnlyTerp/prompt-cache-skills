@@ -70,7 +70,7 @@
   </g>
 
   <!-- Main title -->
-  <text x="450" y="110" text-anchor="middle" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="46" font-weight="700" fill="#f1f5f9" filter="url(#textshadow)" letter-spacing="-1">
+  <text x="450" y="110" text-anchor="middle" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="48" font-weight="700" fill="#f8fafc" filter="url(#textshadow)" letter-spacing="-1">
     prompt-cache-skills
   </text>
 
@@ -78,7 +78,7 @@
   <rect x="300" y="125" width="300" height="3" rx="1.5" fill="url(#accent)" opacity="0.8"/>
 
   <!-- Tagline -->
-  <text x="450" y="165" text-anchor="middle" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="18" fill="#94a3b8" letter-spacing="0.5">
+  <text x="450" y="162" text-anchor="middle" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="19" fill="#cbd5e1" letter-spacing="0.3">
     Drop-in prompt-caching fixes for every LLM agent harness
   </text>
 
@@ -87,27 +87,27 @@
     <!-- 13 Skills -->
     <g transform="translate(-260, 0)">
       <rect x="-55" y="-18" width="110" height="36" rx="18" fill="#6366f1" fill-opacity="0.15" stroke="#6366f1" stroke-width="1" stroke-opacity="0.4"/>
-      <text x="0" y="6" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="600" fill="#a5b4fc">13 Skills</text>
+      <text x="0" y="6" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="15" font-weight="600" fill="#c7d2fe">13 Skills</text>
     </g>
     <!-- 13 Audits -->
     <g transform="translate(-110, 0)">
-      <rect x="-75" y="-18" width="150" height="36" rx="18" fill="#6366f1" fill-opacity="0.15" stroke="#6366f1" stroke-width="1" stroke-opacity="0.4"/>
-      <text x="0" y="6" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="600" fill="#a5b4fc">13 Audits</text>
+      <rect x="-60" y="-18" width="120" height="36" rx="18" fill="#6366f1" fill-opacity="0.15" stroke="#6366f1" stroke-width="1" stroke-opacity="0.4"/>
+      <text x="0" y="6" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="15" font-weight="600" fill="#c7d2fe">13 Audits</text>
     </g>
     <!-- 4 Providers -->
-    <g transform="translate(60, 0)">
-      <rect x="-70" y="-18" width="140" height="36" rx="18" fill="#6366f1" fill-opacity="0.15" stroke="#6366f1" stroke-width="1" stroke-opacity="0.4"/>
-      <text x="0" y="6" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="600" fill="#a5b4fc">4 Providers</text>
+    <g transform="translate(45, 0)">
+      <rect x="-65" y="-18" width="130" height="36" rx="18" fill="#6366f1" fill-opacity="0.15" stroke="#6366f1" stroke-width="1" stroke-opacity="0.4"/>
+      <text x="0" y="6" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="15" font-weight="600" fill="#c7d2fe">4 Providers</text>
     </g>
     <!-- 10x Savings -->
-    <g transform="translate(220, 0)">
-      <rect x="-65" y="-18" width="130" height="36" rx="18" fill="#10b981" fill-opacity="0.15" stroke="#10b981" stroke-width="1" stroke-opacity="0.4"/>
-      <text x="0" y="6" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="700" fill="#6ee7b7">Up to 10x Savings</text>
+    <g transform="translate(215, 0)">
+      <rect x="-70" y="-18" width="140" height="36" rx="18" fill="#10b981" fill-opacity="0.15" stroke="#10b981" stroke-width="1" stroke-opacity="0.4"/>
+      <text x="0" y="6" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="15" font-weight="700" fill="#86efac">Up to 10x Savings</text>
     </g>
   </g>
 
   <!-- Bottom tagline -->
-  <text x="450" y="275" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="13" fill="#64748b" letter-spacing="0.5">
+  <text x="450" y="275" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" fill="#94a3b8" letter-spacing="0.3">
     Point your AI agent at this repo. It reads the skills. It ships the patches. You save money.
   </text>
 

@@ -194,7 +194,7 @@ right. This repo does that work for you.
 ## The grade card
 
 <p align="center">
-  <img src="assets/scorecard.svg" alt="Harness scorecard — 13 completed audits across Anthropic, OpenAI, Bedrock, Gemini, and managed providers" width="900">
+  <img src="assets/scorecard.svg" alt="Audit scorecard — 13 harnesses grouped by cache status: working, needs fixes, and unverified" width="900">
 </p>
 
 13 completed harness audits, dated 2026-05-27. The first 7 are OSS/source-recon audits; the extended 6 include redacted wire or local-install evidence where the surface is closed. Six more files in `audits/` are queued stubs, not completed audits.
