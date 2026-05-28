@@ -62,8 +62,36 @@ If you just want to fix your own harness:
 
 ## Status
 
-This is the scaffold. The actual per-harness audit work is tracked in
-[`EXECUTION_PLAN.md`](EXECUTION_PLAN.md). See that file for the work queue.
+First wave of audits complete (2026-05-27). 7 harnesses graded:
+
+| Harness | Anthropic | OpenAI | Bedrock | Gemini |
+|---------|-----------|--------|---------|--------|
+| Claude Code | working* | n/a | n/a | n/a |
+| Codex CLI | n/a | **working** | n/a | n/a |
+| Aider | working | automatic | n/a | n/a |
+| OpenCode | working | working | partial | n/a |
+| Roo Code | partial | working | partial | n/a |
+| Cline | partial | **broken** | unverified | n/a |
+| Continue | partial | partial | partial | broken |
+
+\* inferred from wire shape; source closed.
+
+Full scorecard with file:line citations and proposed upstream patches
+in [`docs/scorecard.md`](docs/scorecard.md).
+
+Headline findings:
+- A "last 2 user messages" copy-paste bug propagated Cline → Roo →
+  Continue, burning a breakpoint on the volatile current turn.
+- Cline OpenAI native sends no `prompt_cache_key` and no prefix-stability
+  work — users are paying full price.
+- Gemini explicit caching (`cachedContents`) is universally unimplemented.
+- Codex CLI is the reference for OpenAI-side caching (thread_id cache key,
+  preserved across compaction and sub-agents).
+- OpenCode's system-prompt split is the best Anthropic pattern in OSS.
+
+Remaining work (Phase 3 for: goose, aichat, gptme, avante.nvim,
+kilo-code, crush) tracked in [`PROGRESS.md`](PROGRESS.md). Wire-capture
+re-validation tracked in [`EXECUTION_PLAN.md`](EXECUTION_PLAN.md).
 
 ## Contributing
 

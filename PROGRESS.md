@@ -6,13 +6,13 @@
 
 ## Phase 1 — Reference docs
 
-- [ ] `docs/concepts/anthropic.md` — verify all numbers + stamp date
-- [ ] `docs/concepts/openai.md` — verify all numbers + stamp date
-- [ ] `docs/concepts/gemini.md` — verify minimums (Pro/Flash) + stamp date
+- [x] `docs/concepts/anthropic.md` — verified 2026-05-27; pricing table added; worked example from shim
+- [x] `docs/concepts/openai.md` — verified 2026-05-27; `prompt_cache_key` Responses API trick added
+- [x] `docs/concepts/gemini.md` — verified 2026-05-27; 3.5/3.0/2.5 Pro/Flash min tokens corrected
 - [ ] `docs/concepts/bedrock.md` — verify model support matrix + stamp date
 - [ ] `docs/concepts/vertex.md` — verify region availability + stamp date
-- [ ] `docs/gotchas.md` — read through, add anything missing
-- [ ] `docs/verification.md` — read through, add anything missing
+- [x] `docs/gotchas.md` — added #9b (UUID cache_key footgun)
+- [x] `docs/verification.md` — initial pass complete
 - [ ] `docs/providers/README.md` — re-check links return 200
 
 ## Phase 2 — Tooling
@@ -28,13 +28,13 @@
 
 Priority order:
 
-- [ ] `harnesses/claude-code.md`
-- [ ] `harnesses/cline.md`
-- [ ] `harnesses/roo-code.md`
-- [ ] `harnesses/aider.md` (both Anthropic + OpenAI)
-- [ ] `harnesses/opencode.md`
-- [ ] `harnesses/codex-cli.md`
-- [ ] `harnesses/continue.md`
+- [x] `harnesses/claude-code.md` — inferred; closed source
+- [x] `harnesses/cline.md` — partial; volatile-msg bug; OpenAI broken
+- [x] `harnesses/roo-code.md` — partial; same Anthropic bug; Bedrock custom ARN gap
+- [x] `harnesses/aider.md` — working with `--cache-prompts`; 1h TTL gap
+- [x] `harnesses/opencode.md` — working on Anthropic; OpenAI-compatible→Anthropic broken
+- [x] `harnesses/codex-cli.md` — working; reference implementation for OpenAI
+- [x] `harnesses/continue.md` — partial; opt-in; Gemini missing
 - [ ] `harnesses/crush.md`
 - [ ] `harnesses/goose.md`
 - [ ] `harnesses/aichat.md`
@@ -42,10 +42,17 @@ Priority order:
 - [ ] `harnesses/avante-nvim.md`
 - [ ] `harnesses/kilo-code.md`
 
+### Wire-capture re-validation (TODO for any of the above)
+
+Source recon found bugs but didn't measure hit rates. Pending:
+- [ ] Cline — confirm volatile-msg bug produces non-zero `cache_creation` every turn
+- [ ] Claude Code — capture to confirm inferred breakpoint pattern
+- [ ] Aider — verify 4-breakpoint placement and hit rate ≥80%
+
 ## Phase 4 — Headline artifact
 
-- [ ] `docs/scorecard.md` — fill in once ≥6 harnesses audited
-- [ ] README → add scorecard summary table near the top
+- [x] `docs/scorecard.md` — 7 harnesses graded per-provider
+- [x] README → scorecard summary table added
 
 ## Phase 5 — Upstream PRs
 
