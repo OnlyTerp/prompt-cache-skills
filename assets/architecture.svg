@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 420" width="900" height="420">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 430" width="900" height="430">
   <defs>
     <linearGradient id="ar-bg" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#0a0e1a"/>
@@ -26,89 +26,87 @@
   </defs>
 
   <!-- Background -->
-  <rect width="900" height="420" rx="12" fill="url(#ar-bg)"/>
+  <rect width="900" height="430" rx="12" fill="url(#ar-bg)"/>
 
   <!-- Title -->
-  <text x="450" y="35" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="20" font-weight="700" fill="#e2e8f0" letter-spacing="0.5">Repository Structure</text>
-  <rect x="375" y="44" width="150" height="2" rx="1" fill="url(#ar-purple)" opacity="0.6"/>
+  <text x="450" y="38" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="22" font-weight="700" fill="#f1f5f9" letter-spacing="0.5">Repository Structure</text>
+  <rect x="370" y="48" width="160" height="2.5" rx="1" fill="url(#ar-purple)" opacity="0.7"/>
 
   <!-- Skills Column (left) -->
   <g transform="translate(130, 80)" filter="url(#ar-shadow)">
-    <rect x="-100" y="-12" width="200" height="30" rx="6" fill="url(#ar-purple)" opacity="0.9"/>
-    <text x="0" y="9" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="13" font-weight="700" fill="#fff">skills/</text>
-    <g transform="translate(0, 32)">
-      <rect x="-95" y="0" width="190" height="262" rx="8" fill="#1e1b4b" fill-opacity="0.4" stroke="#6366f1" stroke-width="0.5" stroke-opacity="0.3"/>
-      <text x="-80" y="22" font-family="'Courier New', monospace" font-size="10" fill="#a5b4fc">cline-fix-volatile-msg/</text>
-      <text x="-80" y="40" font-family="'Courier New', monospace" font-size="10" fill="#a5b4fc">cline-openai-cache-key/</text>
-      <text x="-80" y="58" font-family="'Courier New', monospace" font-size="10" fill="#a5b4fc">cline-pin-timestamp/</text>
-      <text x="-80" y="76" font-family="'Courier New', monospace" font-size="10" fill="#a5b4fc">roo-fix-volatile-msg/</text>
-      <text x="-80" y="94" font-family="'Courier New', monospace" font-size="10" fill="#a5b4fc">roo-bedrock-custom-arn/</text>
-      <text x="-80" y="112" font-family="'Courier New', monospace" font-size="10" fill="#a5b4fc">continue-fix-volatile-msg/</text>
-      <text x="-80" y="130" font-family="'Courier New', monospace" font-size="10" fill="#a5b4fc">continue-enable-defaults/</text>
-      <text x="-80" y="148" font-family="'Courier New', monospace" font-size="10" fill="#a5b4fc">continue-gemini-explicit/</text>
-      <text x="-80" y="166" font-family="'Courier New', monospace" font-size="10" fill="#a5b4fc">opencode-detect-compat/</text>
-      <text x="-80" y="184" font-family="'Courier New', monospace" font-size="10" fill="#a5b4fc">opencode-bedrock-docs/</text>
-      <text x="-80" y="202" font-family="'Courier New', monospace" font-size="10" fill="#a5b4fc">opencode-mistral-cache/</text>
-      <text x="-80" y="220" font-family="'Courier New', monospace" font-size="10" fill="#a5b4fc">aider-1h-ttl/</text>
-      <text x="-80" y="238" font-family="'Courier New', monospace" font-size="10" fill="#a5b4fc">aider-cache-default-on/</text>
-      <rect x="40" y="247" width="48" height="14" rx="7" fill="#6366f1" fill-opacity="0.3"/>
-      <text x="64" y="257" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="9" font-weight="600" fill="#a5b4fc">13 fixes</text>
+    <rect x="-100" y="-12" width="200" height="32" rx="6" fill="url(#ar-purple)" opacity="0.9"/>
+    <text x="0" y="11" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="700" fill="#fff">skills/</text>
+    <g transform="translate(0, 34)">
+      <rect x="-95" y="0" width="190" height="270" rx="8" fill="#1e1b4b" fill-opacity="0.4" stroke="#6366f1" stroke-width="0.5" stroke-opacity="0.3"/>
+      <text x="-80" y="24" font-family="'Courier New', monospace" font-size="11" fill="#c7d2fe">cline-fix-volatile-msg/</text>
+      <text x="-80" y="43" font-family="'Courier New', monospace" font-size="11" fill="#c7d2fe">cline-openai-cache-key/</text>
+      <text x="-80" y="62" font-family="'Courier New', monospace" font-size="11" fill="#c7d2fe">cline-pin-timestamp/</text>
+      <text x="-80" y="81" font-family="'Courier New', monospace" font-size="11" fill="#c7d2fe">roo-fix-volatile-msg/</text>
+      <text x="-80" y="100" font-family="'Courier New', monospace" font-size="11" fill="#c7d2fe">roo-bedrock-custom-arn/</text>
+      <text x="-80" y="119" font-family="'Courier New', monospace" font-size="11" fill="#c7d2fe">continue-fix-volatile/</text>
+      <text x="-80" y="138" font-family="'Courier New', monospace" font-size="11" fill="#c7d2fe">continue-enable-def/</text>
+      <text x="-80" y="157" font-family="'Courier New', monospace" font-size="11" fill="#c7d2fe">continue-gemini-exp/</text>
+      <text x="-80" y="176" font-family="'Courier New', monospace" font-size="11" fill="#c7d2fe">opencode-detect-compat/</text>
+      <text x="-80" y="195" font-family="'Courier New', monospace" font-size="11" fill="#c7d2fe">opencode-bedrock-docs/</text>
+      <text x="-80" y="214" font-family="'Courier New', monospace" font-size="11" fill="#c7d2fe">opencode-mistral-cache/</text>
+      <text x="-80" y="233" font-family="'Courier New', monospace" font-size="11" fill="#c7d2fe">aider-1h-ttl/</text>
+      <text x="-80" y="252" font-family="'Courier New', monospace" font-size="11" fill="#c7d2fe">aider-cache-default-on/</text>
     </g>
   </g>
 
   <!-- Audits Column (center) -->
   <g transform="translate(390, 80)" filter="url(#ar-shadow)">
-    <rect x="-100" y="-12" width="200" height="30" rx="6" fill="url(#ar-blue)" opacity="0.9"/>
-    <text x="0" y="9" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="13" font-weight="700" fill="#fff">audits/</text>
-    <g transform="translate(0, 32)">
-      <rect x="-95" y="0" width="190" height="290" rx="8" fill="#172554" fill-opacity="0.3" stroke="#3b82f6" stroke-width="0.5" stroke-opacity="0.3"/>
-      <text x="-80" y="22" font-family="'Courier New', monospace" font-size="10" fill="#93c5fd">claude-code.md</text>
-      <text x="-80" y="40" font-family="'Courier New', monospace" font-size="10" fill="#93c5fd">codex-cli.md</text>
-      <text x="-80" y="58" font-family="'Courier New', monospace" font-size="10" fill="#93c5fd">aider.md</text>
-      <text x="-80" y="76" font-family="'Courier New', monospace" font-size="10" fill="#93c5fd">opencode.md</text>
-      <text x="-80" y="94" font-family="'Courier New', monospace" font-size="10" fill="#93c5fd">roo-code.md</text>
-      <text x="-80" y="112" font-family="'Courier New', monospace" font-size="10" fill="#93c5fd">cline.md</text>
-      <text x="-80" y="130" font-family="'Courier New', monospace" font-size="10" fill="#93c5fd">continue.md</text>
-      <text x="-80" y="148" font-family="'Courier New', monospace" font-size="10" fill="#93c5fd">hermes-nous.md</text>
-      <text x="-80" y="166" font-family="'Courier New', monospace" font-size="10" fill="#93c5fd">codex-desktop.md</text>
-      <text x="-80" y="184" font-family="'Courier New', monospace" font-size="10" fill="#93c5fd">devin-cli.md</text>
-      <text x="-80" y="202" font-family="'Courier New', monospace" font-size="10" fill="#93c5fd">windsurf-cascade.md</text>
-      <text x="-80" y="220" font-family="'Courier New', monospace" font-size="10" fill="#93c5fd">antigravity.md</text>
-      <text x="-80" y="238" font-family="'Courier New', monospace" font-size="10" fill="#93c5fd">grok-cli.md</text>
-      <text x="-80" y="258" font-family="'Courier New', monospace" font-size="9" fill="#64748b" font-style="italic">+ 6 queued stubs</text>
-      <rect x="20" y="270" width="68" height="14" rx="7" fill="#3b82f6" fill-opacity="0.3"/>
-      <text x="54" y="280" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="9" font-weight="600" fill="#93c5fd">13 + 6 stubs</text>
+    <rect x="-100" y="-12" width="200" height="32" rx="6" fill="url(#ar-blue)" opacity="0.9"/>
+    <text x="0" y="11" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="700" fill="#fff">audits/</text>
+    <g transform="translate(0, 34)">
+      <rect x="-95" y="0" width="190" height="300" rx="8" fill="#172554" fill-opacity="0.3" stroke="#3b82f6" stroke-width="0.5" stroke-opacity="0.3"/>
+      <text x="-80" y="24" font-family="'Courier New', monospace" font-size="11" fill="#bfdbfe">claude-code.md</text>
+      <text x="-80" y="43" font-family="'Courier New', monospace" font-size="11" fill="#bfdbfe">codex-cli.md</text>
+      <text x="-80" y="62" font-family="'Courier New', monospace" font-size="11" fill="#bfdbfe">aider.md</text>
+      <text x="-80" y="81" font-family="'Courier New', monospace" font-size="11" fill="#bfdbfe">opencode.md</text>
+      <text x="-80" y="100" font-family="'Courier New', monospace" font-size="11" fill="#bfdbfe">roo-code.md</text>
+      <text x="-80" y="119" font-family="'Courier New', monospace" font-size="11" fill="#bfdbfe">cline.md</text>
+      <text x="-80" y="138" font-family="'Courier New', monospace" font-size="11" fill="#bfdbfe">continue.md</text>
+      <text x="-80" y="157" font-family="'Courier New', monospace" font-size="11" fill="#bfdbfe">hermes-nous.md</text>
+      <text x="-80" y="176" font-family="'Courier New', monospace" font-size="11" fill="#bfdbfe">codex-desktop.md</text>
+      <text x="-80" y="195" font-family="'Courier New', monospace" font-size="11" fill="#bfdbfe">devin-cli.md</text>
+      <text x="-80" y="214" font-family="'Courier New', monospace" font-size="11" fill="#bfdbfe">windsurf-cascade.md</text>
+      <text x="-80" y="233" font-family="'Courier New', monospace" font-size="11" fill="#bfdbfe">antigravity.md</text>
+      <text x="-80" y="252" font-family="'Courier New', monospace" font-size="11" fill="#bfdbfe">grok-cli.md</text>
+      <text x="-80" y="274" font-family="'Courier New', monospace" font-size="10" fill="#94a3b8" font-style="italic">+ 6 queued stubs</text>
+      <rect x="24" y="282" width="63" height="14" rx="7" fill="#3b82f6" fill-opacity="0.3"/>
+      <text x="55" y="292" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="9" font-weight="600" fill="#bfdbfe">13 + 6</text>
     </g>
   </g>
 
   <!-- Docs + Tools Column (right) -->
   <g transform="translate(660, 80)" filter="url(#ar-shadow)">
     <!-- docs/ -->
-    <rect x="-100" y="-12" width="200" height="30" rx="6" fill="url(#ar-teal)" opacity="0.9"/>
-    <text x="0" y="9" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="13" font-weight="700" fill="#fff">docs/</text>
-    <g transform="translate(0, 32)">
-      <rect x="-95" y="0" width="190" height="128" rx="8" fill="#164e63" fill-opacity="0.2" stroke="#0891b2" stroke-width="0.5" stroke-opacity="0.3"/>
-      <text x="-80" y="22" font-family="'Courier New', monospace" font-size="10" fill="#67e8f9">concepts/anthropic.md</text>
-      <text x="-80" y="40" font-family="'Courier New', monospace" font-size="10" fill="#67e8f9">concepts/openai.md</text>
-      <text x="-80" y="58" font-family="'Courier New', monospace" font-size="10" fill="#67e8f9">concepts/gemini.md</text>
-      <text x="-80" y="76" font-family="'Courier New', monospace" font-size="10" fill="#67e8f9">concepts/bedrock.md</text>
-      <text x="-80" y="94" font-family="'Courier New', monospace" font-size="10" fill="#67e8f9">gotchas.md</text>
-      <text x="-80" y="112" font-family="'Courier New', monospace" font-size="10" fill="#67e8f9">scorecard.md</text>
+    <rect x="-100" y="-12" width="200" height="32" rx="6" fill="url(#ar-teal)" opacity="0.9"/>
+    <text x="0" y="11" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="700" fill="#fff">docs/</text>
+    <g transform="translate(0, 34)">
+      <rect x="-95" y="0" width="190" height="130" rx="8" fill="#164e63" fill-opacity="0.2" stroke="#0891b2" stroke-width="0.5" stroke-opacity="0.3"/>
+      <text x="-80" y="24" font-family="'Courier New', monospace" font-size="11" fill="#a5f3fc">concepts/anthropic.md</text>
+      <text x="-80" y="43" font-family="'Courier New', monospace" font-size="11" fill="#a5f3fc">concepts/openai.md</text>
+      <text x="-80" y="62" font-family="'Courier New', monospace" font-size="11" fill="#a5f3fc">concepts/gemini.md</text>
+      <text x="-80" y="81" font-family="'Courier New', monospace" font-size="11" fill="#a5f3fc">concepts/bedrock.md</text>
+      <text x="-80" y="100" font-family="'Courier New', monospace" font-size="11" fill="#a5f3fc">gotchas.md</text>
+      <text x="-80" y="119" font-family="'Courier New', monospace" font-size="11" fill="#a5f3fc">scorecard.md</text>
     </g>
     <!-- tools/ -->
-    <g transform="translate(0, 172)">
-      <rect x="-100" y="-12" width="200" height="30" rx="6" fill="url(#ar-green)" opacity="0.9"/>
-      <text x="0" y="9" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="13" font-weight="700" fill="#fff">tools/</text>
-      <g transform="translate(0, 26)">
-        <rect x="-95" y="0" width="190" height="94" rx="8" fill="#052e16" fill-opacity="0.3" stroke="#10b981" stroke-width="0.5" stroke-opacity="0.3"/>
-        <text x="-80" y="22" font-family="'Courier New', monospace" font-size="10" fill="#6ee7b7">check_cache.py</text>
-        <text x="-80" y="40" font-family="'Courier New', monospace" font-size="10" fill="#6ee7b7">check_docs_consistency.py</text>
-        <text x="-80" y="58" font-family="'Courier New', monospace" font-size="10" fill="#6ee7b7">audit_harness.sh</text>
-        <text x="-80" y="76" font-family="'Courier New', monospace" font-size="10" fill="#6ee7b7">replay_harness.md</text>
+    <g transform="translate(0, 178)">
+      <rect x="-100" y="-12" width="200" height="32" rx="6" fill="url(#ar-green)" opacity="0.9"/>
+      <text x="0" y="11" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="700" fill="#fff">tools/</text>
+      <g transform="translate(0, 28)">
+        <rect x="-95" y="0" width="190" height="100" rx="8" fill="#052e16" fill-opacity="0.3" stroke="#10b981" stroke-width="0.5" stroke-opacity="0.3"/>
+        <text x="-80" y="24" font-family="'Courier New', monospace" font-size="11" fill="#86efac">check_cache.py</text>
+        <text x="-80" y="43" font-family="'Courier New', monospace" font-size="11" fill="#86efac">check_docs_consistency</text>
+        <text x="-80" y="62" font-family="'Courier New', monospace" font-size="11" fill="#86efac">audit_harness.sh</text>
+        <text x="-80" y="81" font-family="'Courier New', monospace" font-size="11" fill="#86efac">replay_harness.md</text>
       </g>
     </g>
   </g>
 
   <!-- Border -->
-  <rect x="0.5" y="0.5" width="899" height="419" rx="12" fill="none" stroke="#6366f1" stroke-width="0.5" stroke-opacity="0.15"/>
+  <rect x="0.5" y="0.5" width="899" height="429" rx="12" fill="none" stroke="#6366f1" stroke-width="0.5" stroke-opacity="0.15"/>
 </svg>
