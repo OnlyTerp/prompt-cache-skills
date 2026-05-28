@@ -100,7 +100,7 @@
       <g transform="translate(0, 28)">
         <rect x="-95" y="0" width="190" height="100" rx="8" fill="#052e16" fill-opacity="0.3" stroke="#10b981" stroke-width="0.5" stroke-opacity="0.3"/>
         <text x="-80" y="24" font-family="'Courier New', monospace" font-size="11" fill="#86efac">check_cache.py</text>
-        <text x="-80" y="43" font-family="'Courier New', monospace" font-size="11" fill="#86efac">check_docs_consistency</text>
+        <text x="-80" y="43" font-family="'Courier New', monospace" font-size="11" fill="#86efac">check_docs_consistency.py</text>
         <text x="-80" y="62" font-family="'Courier New', monospace" font-size="11" fill="#86efac">audit_harness.sh</text>
         <text x="-80" y="81" font-family="'Courier New', monospace" font-size="11" fill="#86efac">replay_harness.md</text>
       </g>
