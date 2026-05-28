@@ -23,20 +23,25 @@ research yourself.
 
 ## What you actually save
 
-Real numbers from the audit underneath this:
+One row per audited harness, so the coverage matches the scorecard:
 
-| Harness | Bug | Current cost | After fix |
-|---------|-----|--------------|-----------|
-| Cline (Anthropic) | Caches volatile current user msg every turn | 1 of 3 breakpoints wasted, 30% premium-burn | Full breakpoint utilization, ~99% hit rate |
-| Cline (OpenAI) | No `prompt_cache_key`, no cache hits at all | 0% cache reads | 50-90% input discount |
-| Roo Code (Bedrock custom ARN) | Silently disables caching | 0% cache reads | Full Bedrock caching |
-| Continue | Caching opt-in by default; most users never enable it | 0% for most users | 90% discount default |
-| Continue (Gemini) | Explicit `cachedContents` API not implemented at all | Implicit-cache luck only | Guaranteed 75% discount on Pro |
-| Aider | 5min TTL + costly keepalive pings | 5min cache windows | 1h cache, no pings |
-| Aider | `--cache-prompts` off by default | 0% for most users | 90% discount default |
-| OpenCode | OpenAI-compatible proxies → Anthropic miss caching | 0% on LiteLLM/Bifrost routes | Full Anthropic caching through proxies |
+| Harness | Finding | Cost impact today | Fix / status |
+|---------|---------|-------------------|--------------|
+| Claude Code | Closed source; cache behavior inferred from wire shape | No verified bug in this repo | No skill; keep as reference/inferred working |
+| Codex CLI | Correct OpenAI cache design: stable `thread_id` cache key | Already gets OpenAI cache benefits | No skill; reference implementation |
+| Aider | `--cache-prompts` off by default; 5min TTL/keepalive overhead | Many users get 0% cache reads unless they opt in; shorter cache window | Skills: default-on caching + 1h TTL |
+| OpenCode | Strong Anthropic path, but proxy/Bedrock edge cases exist | Some OpenAI-compatible→Anthropic/Bedrock routes miss cache | Skills: proxy detection + Bedrock doc-block fix |
+| Roo Code | Anthropic volatile-message bug; Bedrock custom ARN gap | Wastes breakpoints; custom ARNs can drop to 0% cache reads | Skills: volatile-msg fix + Bedrock custom ARN fix |
+| Cline | Anthropic volatile-message bug; OpenAI lacks `prompt_cache_key` | Wastes Anthropic breakpoint; OpenAI native can get 0% cache reads | Skills: volatile-msg fix + OpenAI cache key + timestamp pin |
+| Continue | Cache opt-in default; Gemini explicit caching missing; volatile-message bug | Many users get 0% cache reads; Gemini relies on implicit luck | Skills: default-on + volatile-msg + Gemini explicit cache |
+| Hermes / Nous | Multi-provider cache plumbing works; xAI wire showed cached tokens | No verified savings bug in this audit | No skill; working audit |
+| Codex Desktop | ChatGPT Codex backend cache-scope headers observed/inferred | No verified savings bug in this audit | No skill; inferred working |
+| Devin CLI | Raw CLI model path is opaque Codeium/Devin protobuf | Cache behavior not inspectable from public CLI capture | No skill; unverified managed backend |
+| Windsurf / Cascade | Closed desktop; model turn not captured from CLI | Cache behavior unverified | No skill; needs desktop capture |
+| Antigravity | Closed desktop; no model turn captured | Cache behavior unverified | No skill; needs desktop capture |
+| Grok CLI | CLI answered, but model call did not hit mitmproxy | Cache behavior unverified | No skill; needs transport-aware capture |
 
-13 skills total, each one a self-contained fix. See
+13 skills total cover the verified patchable OSS bugs. See
 [`skills/README.md`](skills/README.md) for the full index.
 
 ## How to use it
