@@ -1,9 +1,10 @@
 # Scorecard
 
-> Source-recon audit of 7 harnesses, dated 2026-05-27. Hit-rate columns
-> are absent because wire capture wasn't performed in this round —
-> verdicts are based on source inspection. Re-runs with measured rates
-> are tracked in [`../PROGRESS.md`](../PROGRESS.md).
+> Audit set dated 2026-05-27: 7 OSS harness source-recon audits plus
+> 6 extended source/wire/local-install audits. Hit-rate columns are
+> absent for the original OSS round because wire capture wasn't
+> performed there. The extended round records redacted mitm evidence
+> where available and marks closed/opaque surfaces explicitly.
 
 ## Anthropic providers
 
@@ -15,6 +16,7 @@
 | Cline | yes | 3 (system, last 2 user msgs) | 5min | **yes** | **partial** | [`../audits/cline.md`](../audits/cline.md) |
 | Roo Code | yes | 3 (system, last 2 user msgs) | 5min | **yes** | **partial** | [`../audits/roo-code.md`](../audits/roo-code.md) |
 | Continue | yes (config-gated, off by default) | 3 (system, last 2 user msgs) | 5min | **yes** | **partial** | [`../audits/continue.md`](../audits/continue.md) |
+| Hermes / Nous | yes | 4 (system + last 3) | 5min / 1h config | no source evidence of volatile bug | **working** | [`../audits/hermes-nous.md`](../audits/hermes-nous.md) |
 
 ## OpenAI providers (Responses API + Chat Completions)
 
@@ -24,6 +26,7 @@ and whether they set `prompt_cache_key` to a stable value.
 | Harness | `prompt_cache_key` set? | Stable hash or UUID? | Prefix byte-stable? | Verdict | Audit |
 |---------|------------------------|----------------------|---------------------|---------|-------|
 | Codex CLI | yes | stable (`thread_id`) | yes (`base_instructions`) | **working** | [`../audits/codex-cli.md`](../audits/codex-cli.md) |
+| Codex Desktop | inferred via `session_id` / `x-client-request-id` | stable thread id | inherited from Codex backend | **working (inferred)** | [`../audits/codex-desktop.md`](../audits/codex-desktop.md) |
 | Aider | n/a (Chat Completions; auto) | n/a | yes (no timestamp pollution) | **automatic** | [`../audits/aider.md`](../audits/aider.md) |
 | Roo Code | yes | stable (sha256 of system + first msg) | yes | **working** | [`../audits/roo-code.md`](../audits/roo-code.md) |
 | OpenCode | yes | unverified (likely stable) | yes (with system split) | **working** | [`../audits/opencode.md`](../audits/opencode.md) |
@@ -51,6 +54,7 @@ the API.
 | Harness | Uses `cachedContents`? | Implicit cache OK? | Verdict | Audit |
 |---------|-----------------------|--------------------|---------|-------|
 | Continue | **no** | yes (no prefix pollution) | **broken** (explicit) / **automatic** (implicit) | [`../audits/continue.md`](../audits/continue.md) |
+| Antigravity | unverified | unverified | **unverified** | [`../audits/antigravity.md`](../audits/antigravity.md) |
 
 (Other harnesses don't ship Gemini support, or do via OpenRouter
 passthrough — which is rated under the Anthropic column above when
@@ -67,6 +71,17 @@ Top-level `prompt_cache_ttl` is silently dropped (OpenCode #16848).
 | OpenCode | yes (content-level ttl) | yes (PR #20266 Vertex) | **working** | [`../audits/opencode.md`](../audits/opencode.md) |
 | Roo Code | yes (delegates via transform module) | yes | **working** | [`../audits/roo-code.md`](../audits/roo-code.md) |
 | Cline | yes (Anthropic + MiniMax detected) | unverified | **partial** | [`../audits/cline.md`](../audits/cline.md) |
+
+## Managed / closed-provider surfaces
+
+| Harness | Cache routing observed? | Usage observed? | Verdict | Audit |
+|---------|-------------------------|-----------------|---------|-------|
+| Hermes / Nous | yes: `prompt_cache_key` + `x-grok-conv-id` on xAI `/v1/responses` | yes: `input_tokens_details.cached_tokens` | **working** | [`../audits/hermes-nous.md`](../audits/hermes-nous.md) |
+| Codex Desktop | yes (inferred): `session_id` + `x-client-request-id` on ChatGPT Codex backend | no successful usage block in captured run | **working (inferred)** | [`../audits/codex-desktop.md`](../audits/codex-desktop.md) |
+| Grok CLI | no model call captured; only update checks reached mitmproxy | no | **unverified** | [`../audits/grok-cli.md`](../audits/grok-cli.md) |
+| Devin CLI | opaque Codeium/Devin Connect protobuf | no provider cache fields visible | **unverified** | [`../audits/devin-cli.md`](../audits/devin-cli.md) |
+| Windsurf / Cascade | desktop turn not captured from CLI | no | **unverified** | [`../audits/windsurf-cascade.md`](../audits/windsurf-cascade.md) |
+| Antigravity | desktop turn not captured; no local provider source | no | **unverified** | [`../audits/antigravity.md`](../audits/antigravity.md) |
 
 ## Headline findings
 
@@ -104,6 +119,16 @@ Top-level `prompt_cache_ttl` is silently dropped (OpenCode #16848).
 7. **Continue requires explicit opt-in.** Default is no caching. For
    the median user this means the harness is leaving 90% input
    discount on the table.
+
+8. **Hermes / Nous has real multi-provider cache plumbing.** Source
+   inspection found Anthropic/OpenRouter/Nous/Qwen policy branches, and
+   xAI wire capture confirmed `prompt_cache_key`, `x-grok-conv-id`, and
+   non-zero `cached_tokens`.
+
+9. **Managed desktop/CLI surfaces need transport-specific capture.**
+   Devin raw CLI is protobuf, Grok CLI's model call did not hit the HTTP
+   proxy, and Windsurf/Antigravity require desktop-driven captures. These
+   are explicitly unverified rather than graded by guesswork.
 
 ## Recommended ranking (best to worst for typical Anthropic-targeted use)
 

@@ -111,7 +111,13 @@ prompt-cache-skills/
 │   ├── opencode.md
 │   ├── continue.md
 │   ├── codex-cli.md              ← (reference, already correct)
-│   └── claude-code.md
+│   ├── claude-code.md
+│   ├── hermes-nous.md
+│   ├── codex-desktop.md
+│   ├── devin-cli.md
+│   ├── windsurf-cascade.md
+│   ├── antigravity.md
+│   └── grok-cli.md
 ├── docs/                         ← the underlying API mechanics
 │   ├── concepts/                 ← per-provider caching reference
 │   ├── gotchas.md                ← 16 numbered footguns
@@ -144,19 +150,25 @@ right. This repo does that work for you.
 
 ## The grade card
 
-7 harnesses audited from source, dated 2026-05-27:
+13 harnesses audited, dated 2026-05-27. The first 7 are OSS/source-recon audits; the extended 6 include redacted wire or local-install evidence where the surface is closed:
 
-| Harness | Anthropic | OpenAI | Bedrock | Gemini |
-|---------|-----------|--------|---------|--------|
-| Claude Code | working* | n/a | n/a | n/a |
-| Codex CLI | n/a | **working** | n/a | n/a |
-| Aider | working | automatic | n/a | n/a |
-| OpenCode | working | working | partial | n/a |
-| Roo Code | partial | working | partial | n/a |
-| Cline | partial | **broken** | unverified | n/a |
-| Continue | partial | partial | partial | broken |
+| Harness | Anthropic | OpenAI | Bedrock | Gemini | Managed/other |
+|---------|-----------|--------|---------|--------|---------------|
+| Claude Code | working* | n/a | n/a | n/a | n/a |
+| Codex CLI | n/a | **working** | n/a | n/a | n/a |
+| Aider | working | automatic | n/a | n/a | n/a |
+| OpenCode | working | working | partial | n/a | n/a |
+| Roo Code | partial | working | partial | n/a | n/a |
+| Cline | partial | **broken** | unverified | n/a | n/a |
+| Continue | partial | partial | partial | broken | n/a |
+| Hermes / Nous | **working** | working (Responses) | n/a | unverified | xAI working |
+| Codex Desktop | n/a | working* | n/a | n/a | ChatGPT Codex backend inferred |
+| Devin CLI | n/a | n/a | n/a | n/a | unverified (opaque protobuf) |
+| Windsurf / Cascade | n/a | n/a | n/a | n/a | unverified (desktop not captured) |
+| Antigravity | n/a | n/a | n/a | unverified | unverified (desktop not captured) |
+| Grok CLI | n/a | n/a | n/a | n/a | unverified (model call not captured) |
 
-\* inferred from wire shape; source closed.
+\* inferred from closed-source wire shape and/or public companion source.
 
 Full per-provider breakdown with file:line citations in
 [`docs/scorecard.md`](docs/scorecard.md).
@@ -175,6 +187,12 @@ Full per-provider breakdown with file:line citations in
 4. **Codex CLI is the reference for OpenAI-side caching** — thread_id
    as cache key, preserved across compaction and into sub-agents.
 5. **OpenCode's system-prompt split is the best Anthropic pattern.**
+6. **Hermes / Nous has real multi-provider cache plumbing** — source
+   covers Anthropic/OpenRouter/Nous/Qwen and xAI wire capture showed
+   `prompt_cache_key`, `x-grok-conv-id`, and non-zero cached tokens.
+7. **Closed managed surfaces need transport-aware capture.** Devin,
+   Windsurf, Antigravity, and Grok CLI are marked unverified where the
+   model channel was protobuf, desktop-only, or proxy-invisible.
 
 ## Trust but verify
 

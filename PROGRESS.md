@@ -35,6 +35,12 @@ Priority order:
 - [x] `audits/opencode.md` — working on Anthropic; OpenAI-compatible→Anthropic broken
 - [x] `audits/codex-cli.md` — working; reference implementation for OpenAI
 - [x] `audits/continue.md` — partial; opt-in; Gemini missing
+- [x] `audits/hermes-nous.md` — working; source + xAI wire evidence (`prompt_cache_key`, `x-grok-conv-id`, cached tokens)
+- [x] `audits/codex-desktop.md` — working inferred; ChatGPT Codex backend cache-scope headers captured
+- [x] `audits/devin-cli.md` — unverified; raw CLI captured as opaque Codeium/Devin Connect protobuf
+- [x] `audits/windsurf-cascade.md` — unverified; closed desktop, no one-shot model capture
+- [x] `audits/antigravity.md` — unverified; closed desktop, no model capture
+- [x] `audits/grok-cli.md` — unverified; CLI answered but model call did not hit mitmproxy
 - [ ] `audits/crush.md`
 - [ ] `audits/goose.md`
 - [ ] `audits/aichat.md`
@@ -51,8 +57,9 @@ Source recon found bugs but didn't measure hit rates. Pending:
 
 ## Phase 4 — Headline artifact
 
-- [x] `docs/scorecard.md` — 7 harnesses graded per-provider
-- [x] README → scorecard summary table added
+- [x] `docs/scorecard.md` — 13 harnesses graded per-provider / managed-surface status
+- [x] README → expanded 13-harness scorecard summary table added
+- [x] Extended capture round — Hermes, Devin, Codex CLI backend, Grok CLI attempts recorded; closed desktop blockers documented
 
 ## Phase 5 — Upstream PRs
 

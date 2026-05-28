@@ -58,8 +58,8 @@ its own. Skills, not benchmarks; audits are the proof, not the product.
   - Aider: default-on + 1h TTL flag
 - [ ] HN post — title: "Most LLM coding agent harnesses leave 90% off
       your API bill on the table — here's the receipts and the fixes"
-- [ ] X/Twitter post — same framing, table of the 7 harnesses with
-      colored verdicts.
+- [ ] X/Twitter post — same framing, table of the audited harnesses
+      with colored verdicts.
 - [ ] Reddit r/LocalLLaMA + r/ChatGPTCoding: shorter, lead with the
       "give this to your agent" framing.
 
