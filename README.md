@@ -73,7 +73,7 @@ One row per completed audit, so the coverage matches the scorecard:
 In your agent of choice (Claude Code, Codex, Cline, Cursor, Devin, etc.):
 
 ```
-Read https://github.com/<owner>/prompt-cache-skills
+Read https://github.com/OnlyTerp/prompt-cache-skills
 
 Apply every skill in skills/ that matches the harnesses I currently
 use. For each one:
@@ -92,13 +92,13 @@ If you use one of the agents that supports a skills directory:
 
 ```bash
 # Claude Code
-git clone <this-repo> ~/.claude/skills/prompt-cache-skills
+git clone https://github.com/OnlyTerp/prompt-cache-skills ~/.claude/skills/prompt-cache-skills
 
 # Devin
-git clone <this-repo> ~/.config/devin/skills/prompt-cache-skills
+git clone https://github.com/OnlyTerp/prompt-cache-skills ~/.config/devin/skills/prompt-cache-skills
 
 # OpenCode
-git clone <this-repo> ~/.config/opencode/skills/prompt-cache-skills
+git clone https://github.com/OnlyTerp/prompt-cache-skills ~/.config/opencode/skills/prompt-cache-skills
 ```
 
 Then ask your agent:

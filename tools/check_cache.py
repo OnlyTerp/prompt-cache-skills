@@ -49,9 +49,12 @@ def _http(url: str, headers: dict[str, str], body: dict[str, Any]) -> dict[str, 
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
     try:
         with urllib.request.urlopen(req, timeout=120) as resp:
-            return json.loads(resp.read().decode("utf-8"))
+            result: dict[str, Any] = json.loads(resp.read().decode("utf-8"))
+            return result
     except urllib.error.HTTPError as e:
         raise SystemExit(f"HTTP {e.code}: {e.read().decode('utf-8', 'replace')}")
+    except urllib.error.URLError as e:
+        raise SystemExit(f"connection error: {e.reason}")
 
 
 def call_anthropic(body: dict[str, Any]) -> dict[str, Any]:
@@ -143,8 +146,16 @@ def main() -> int:
     ap.add_argument("--sleep", type=float, default=1.0, help="seconds between cold and warm")
     args = ap.parse_args()
 
-    with open(args.body) as f:
-        body = json.load(f)
+    try:
+        with open(args.body) as f:
+            body = json.load(f)
+    except FileNotFoundError:
+        raise SystemExit(f"body file not found: {args.body}")
+    except json.JSONDecodeError as e:
+        raise SystemExit(f"invalid JSON in {args.body}: {e}")
+
+    if not isinstance(body, dict):
+        raise SystemExit(f"body must be a JSON object, got {type(body).__name__}")
 
     caller = CALLERS[args.provider]
 

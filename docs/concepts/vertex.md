@@ -101,4 +101,5 @@ auth). Test before relying on shared code paths.
 
 ---
 
-_Last verified: TODO_
+_Last verified: 2026-05-28 (scaffold content; region availability
+and SDK surface differences need provider-side verification)._

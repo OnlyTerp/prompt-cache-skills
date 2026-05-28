@@ -112,6 +112,41 @@ python3 tools/check_cache.py --provider anthropic --body /tmp/req.json
 If `cache_read` is 0 on the warm call, the fix didn't land or there's
 a second upstream issue. Stop and report rather than retrying blindly.
 
+## Development setup
+
+### Prerequisites
+
+- Python 3.11+ (stdlib only — no pip install needed)
+- Node.js 18+ (for `markdownlint-cli2` via npx)
+
+### Build / lint / test commands
+
+```bash
+# Python syntax check (CI job: python-syntax)
+python3 -m py_compile tools/check_cache.py tools/check_docs_consistency.py
+
+# Docs consistency guard (CI job: consistency)
+python3 tools/check_docs_consistency.py
+
+# Markdown lint (CI job: markdown-lint)
+npx markdownlint-cli2 '**/*.md' '!**/node_modules/**'
+
+# Python unit tests (CI job: python-tests)
+python3 -m pytest tests/ -v
+
+# Python type check (CI job: python-typecheck)
+python3 -m mypy tools/ --strict
+
+# Secrets scan (CI job: secrets-scan — requires gitleaks binary)
+gitleaks dir . --no-banner
+```
+
+### CI
+
+GitHub Actions workflow at `.github/workflows/ci.yml` runs on every
+push and PR: gitleaks, markdownlint, python syntax, docs consistency,
+pytest, mypy, and link check.
+
 ## When in doubt
 
 Read the SKILL.md fully. They're written to be self-explanatory for
