@@ -1,20 +1,28 @@
 config:
   default: true
-  # Line length: Markdown tables and diffs routinely exceed any reasonable limit.
+  # Line length: Markdown tables and diff blocks routinely exceed any reasonable limit.
   MD013: false
   # Allow inline HTML (used for table layout in some audits).
   MD033: false
   # Duplicate headings: every SKILL.md uses ## Target / ## Symptom / ## Fix etc.
   MD024:
     siblings_only: true
-  # First-line H1 not required for SKILL.md files (they lead with YAML frontmatter).
+  # First-line H1 not required (SKILL.md files lead with YAML frontmatter).
   MD041: false
-  # Bare URLs are fine in audits — they reference issue numbers and source.
+  # Bare URLs OK — audits cite GitHub issue/PR URLs directly.
   MD034: false
-  # Allow # at line start without a space when quoting GitHub issue/PR refs (#1234).
+  # # at line start without space is how we quote GitHub refs (#1234).
   MD018: false
-  # Trailing punctuation in headings is fine for audit headings like "PR #11984:".
+  # Trailing punctuation in headings is fine ("PR #11984:" etc.).
   MD026: false
+  # Don't require language on every fenced code block (we have plain text blocks).
+  MD040: false
+  # Don't require blank lines around lists (verbose for our table-style audits).
+  MD032: false
+  # Don't require blank lines around fenced blocks (same reason).
+  MD031: false
+  # Emphasis-as-heading is fine for our "Last verified:" footnotes.
+  MD036: false
 ignores:
   - "skills/_TEMPLATE/**"
   - "audits/_TEMPLATE.md"
