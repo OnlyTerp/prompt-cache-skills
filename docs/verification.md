@@ -103,6 +103,44 @@ We require captured evidence, not log scraping. Steps:
    - Hit rate computation
    - Commit SHA of the harness at capture time
 
+## If a shim or gateway is in the path
+
+A shim can make caching work, break it, or make a default install look
+like it caches when only the shim is doing the work. Classify the request
+path before grading the harness.
+
+Check for obvious routing/config signals:
+
+- `ANTHROPIC_BASE_URL`
+- `ANTHROPIC_CUSTOM_HEADERS`
+- `ENABLE_PROMPT_CACHING_1H`
+- `CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST`
+- `HTTP_PROXY` / `HTTPS_PROXY`
+- custom gateway, proxy, or enterprise-config logs
+
+Then inspect whether the shim preserves or injects provider cache fields:
+
+- Anthropic: `cache_control`, `cache_creation_input_tokens`,
+  `cache_read_input_tokens`
+- OpenAI Responses: `prompt_cache_key`,
+  `input_tokens_details.cached_tokens`
+- Gemini: `cachedContents`, `cachedContentTokenCount`
+
+Non-zero cache counters prove caching in the observed request path. They
+do **not** prove stock/default product behavior if a shim, gateway, or
+environment override is active. Grade it as:
+
+- **default verified** — clean stock app, no shim/config override, non-zero
+  cache counters.
+- **configured verified** — shim/gateway/env present and non-zero cache
+  counters.
+- **unverified** — no cache counters or request bodies, even if cache
+  flags appear in config.
+
+Also check for shim-induced regressions: volatile timestamps in the
+cached prefix, rotating `prompt_cache_key`, dropped provider usage fields,
+or request-shape conversion that loses `cache_control` / `cachedContents`.
+
 ## When the harness uses streaming SSE
 
 The final event in an SSE stream from Anthropic is
