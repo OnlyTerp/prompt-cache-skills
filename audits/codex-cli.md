@@ -130,3 +130,31 @@ mitmproxy --rfile /tmp/codex.flow
 - For multi-session reuse (e.g. multiple Codex invocations sharing a
   cache), you'd need to externally pin the thread_id — not currently
   exposed as a CLI flag.
+
+## 2026-07-10 provider capability re-audit
+
+This is a provider-doc re-audit, not a fresh source/wire audit of the current
+Codex CLI build.
+
+The original 2026-05-27 statement that OpenAI had no explicit breakpoint API is
+now historical. GPT-5.6 and later model families support:
+
+- `prompt_cache_options.mode` (`implicit` or `explicit`);
+- content-block `prompt_cache_breakpoint`;
+- a supported `30m` TTL value;
+- `cache_write_tokens`;
+- 1.25x cache-write billing.
+
+The stable `thread_id`/`prompt_cache_key` behavior remains a correct foundation,
+but a GPT-5.6 harness can now additionally control breakpoint placement. It
+should also partition high-volume swarm traffic so one key stays near OpenAI's
+approximately 15 requests/minute guidance.
+
+Current Codex CLI breakpoint placement was not inspected in this update. Do not
+claim that stock Codex uses the adaptive first-turn/continuation strategy without
+a fresh source or wire capture.
+
+Official references:
+
+- <https://developers.openai.com/api/docs/guides/prompt-caching>
+- <https://developers.openai.com/api/docs/guides/compaction>

@@ -9,8 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `openai-gpt56-agent-loop-cache` pattern skill covering stable role/shard
+  partitions, adaptive explicit/implicit breakpoints, narrow compatibility
+  fallback, paid-empty-retry guards, and cache-write telemetry.
+- Lossless pre-cache context compaction reference with deterministic local
+  artifact spooling and duplicate-result collapse.
+- GPT-5.6 Responses usage parsing and endpoint auto-detection in
+  `tools/check_cache.py`.
+- Gotchas 17-24 for GPT-5.6 write economics, swarm key partitioning, retry
+  billing, compaction ordering, opaque compaction items, and recoverable
+  truncation.
 - Unit test suite for `tools/check_cache.py` and
-  `tools/check_docs_consistency.py` (34 tests via pytest).
+  `tools/check_docs_consistency.py` (38 tests via pytest).
 - `mypy --strict` type checking for all Python tooling.
 - CI jobs for pytest and mypy.
 - `pyproject.toml` with mypy and pytest configuration.
@@ -19,6 +29,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- OpenAI concept documentation no longer claims all OpenAI caching is
+  uncontrollable or has no write premium; GPT-5.6 behavior is documented
+  separately and stamped 2026-07-10.
+- OpenAI hit-rate calculation now treats cached/write tokens as subsets of
+  input tokens rather than adding them to the denominator.
 - LICENSE copyright holder referenced stale project name
   (`prompt-cache-audit` → `prompt-cache-skills`).
 - README and `skills/README.md` used `<owner>` / `<this-repo>`
@@ -28,6 +43,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `check_cache.py` now catches `URLError` (connection failures) in
   addition to `HTTPError`.
 - Mypy strict type annotation fix in `_http()` return value.
+- Temporary-file tests now close handles before deletion, so they pass on
+  Windows as well as POSIX.
 - `FUNDING.yml` pointed at placeholder instead of `OnlyTerp`.
 - `bedrock.md` and `vertex.md` `_Last verified: TODO_` stamped with
   dates and explicit scaffold caveats.

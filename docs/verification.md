@@ -34,16 +34,22 @@ volatile content. Fix the placement.
 
 ```jsonc
 "usage": {
-  "prompt_tokens": 2104,
-  "completion_tokens": 312,
-  "prompt_tokens_details": {
-    "cached_tokens": 1920
+  "input_tokens": 10000,
+  "output_tokens": 500,
+  "input_tokens_details": {
+    "cached_tokens": 8000,
+    "cache_write_tokens": 1000
   }
 }
 ```
 
-`cached_tokens` is the count served from the cache. Hit rate =
-`cached_tokens / prompt_tokens`.
+`cached_tokens` is the count served from cache. GPT-5.6+
+`cache_write_tokens` is the count written at the cache-write rate. Both are
+subsets of input tokens:
+
+```text
+hit rate = cached_tokens / input_tokens
+```
 
 ### Gemini
 
@@ -123,7 +129,9 @@ Then inspect whether the shim preserves or injects provider cache fields:
 - Anthropic: `cache_control`, `cache_creation_input_tokens`,
   `cache_read_input_tokens`
 - OpenAI Responses: `prompt_cache_key`,
-  `input_tokens_details.cached_tokens`
+  `prompt_cache_options`, content-block `prompt_cache_breakpoint`,
+  `input_tokens_details.cached_tokens`,
+  `input_tokens_details.cache_write_tokens`
 - Gemini: `cachedContents`, `cachedContentTokenCount`
 
 Non-zero cache counters prove caching in the observed request path. They
@@ -147,8 +155,9 @@ The final event in an SSE stream from Anthropic is
 `event: message_delta` with `usage` containing the cache fields. Don't
 look at the `message_start` event — it has placeholder values.
 
-For OpenAI streaming, you need `stream_options: {"include_usage": true}`
-on the request, otherwise `usage` is null in the final chunk.
+For OpenAI Chat Completions streaming, set
+`stream_options: {"include_usage": true}`. Native Responses streams report
+usage in the completed response event.
 
 ## Anti-evidence
 

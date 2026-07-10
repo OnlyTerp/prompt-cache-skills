@@ -87,10 +87,13 @@ message subject.
 If you need to understand WHY a fix matters before applying:
 
 - `docs/concepts/anthropic.md` — Anthropic prompt caching mechanics
-- `docs/concepts/openai.md` — OpenAI prompt caching + `prompt_cache_key`
+- `docs/concepts/openai.md` — OpenAI prompt caching, GPT-5.6 breakpoints,
+  cache-write economics, and `prompt_cache_key`
+- `docs/concepts/context-compaction.md` — immutable pre-cache compaction and
+  lossless artifact spooling
 - `docs/concepts/gemini.md` — Gemini implicit + explicit caching
 - `docs/concepts/bedrock.md` — Bedrock `cachePoint` semantics
-- `docs/gotchas.md` — 16 numbered failure modes
+- `docs/gotchas.md` — 24 numbered failure modes
 - `docs/verification.md` — how to confirm caching is working
 
 For the audit evidence behind each skill:

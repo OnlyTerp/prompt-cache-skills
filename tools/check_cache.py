@@ -25,6 +25,7 @@ The script:
        - Cold turn cache_creation / cache_read / input
        - Warm turn cache_creation / cache_read / input
        - Computed hit rate
+       - GPT-5.6 cache-write tokens when present
 
 It does NOT modify the request body. If you want to test what *your*
 harness sends, capture a request via mitmproxy, save the body to
@@ -81,7 +82,13 @@ def call_openai(body: dict[str, Any]) -> dict[str, Any]:
         "authorization": f"Bearer {key}",
         "content-type": "application/json",
     }
-    return _http("https://api.openai.com/v1/chat/completions", headers, body)
+    request_body = dict(body)
+    api = str(request_body.pop("_api", "")).strip().lower()
+    responses_shape = api == "responses" or (
+        "input" in request_body and "messages" not in request_body
+    )
+    path = "responses" if responses_shape else "chat/completions"
+    return _http(f"https://api.openai.com/v1/{path}", headers, request_body)
 
 
 def call_gemini(body: dict[str, Any]) -> dict[str, Any]:
@@ -114,12 +121,23 @@ def extract_usage(provider: str, resp: dict[str, Any]) -> dict[str, int]:
         }
     if provider == "openai":
         u = resp.get("usage", {})
-        details = u.get("prompt_tokens_details", {}) or {}
+        responses_shape = "input_tokens" in u or "input_tokens_details" in u
+        details_key = (
+            "input_tokens_details" if responses_shape
+            else "prompt_tokens_details"
+        )
+        details = u.get(details_key, {}) or {}
+        if not isinstance(details, dict):
+            details = {}
         return {
-            "input": u.get("prompt_tokens", 0),
-            "cache_creation": 0,  # OpenAI has no write premium / explicit creation count
+            "input": u.get(
+                "input_tokens" if responses_shape else "prompt_tokens", 0
+            ),
+            "cache_creation": details.get("cache_write_tokens", 0),
             "cache_read": details.get("cached_tokens", 0),
-            "output": u.get("completion_tokens", 0),
+            "output": u.get(
+                "output_tokens" if responses_shape else "completion_tokens", 0
+            ),
         }
     if provider == "gemini":
         u = resp.get("usageMetadata", {}) or {}
@@ -132,8 +150,14 @@ def extract_usage(provider: str, resp: dict[str, Any]) -> dict[str, int]:
     raise SystemExit(f"Unknown provider {provider}")
 
 
-def hit_rate(usage: dict[str, int]) -> float:
-    denom = usage["input"] + usage["cache_creation"] + usage["cache_read"]
+def hit_rate(usage: dict[str, int], provider: str | None = None) -> float:
+    # OpenAI cached/write tokens are subsets of input/prompt tokens. Anthropic
+    # reports uncached input, cache creation, and cache reads as separate buckets.
+    denom = (
+        usage["input"]
+        if provider == "openai"
+        else usage["input"] + usage["cache_creation"] + usage["cache_read"]
+    )
     if denom == 0:
         return 0.0
     return 100.0 * usage["cache_read"] / denom
@@ -173,9 +197,13 @@ def main() -> int:
         "provider": args.provider,
         "cold": cold_usage,
         "warm": warm_usage,
-        "hit_rate_cold": round(hit_rate(cold_usage), 2),
-        "hit_rate_warm": round(hit_rate(warm_usage), 2),
+        "hit_rate_cold": round(hit_rate(cold_usage, args.provider), 2),
+        "hit_rate_warm": round(hit_rate(warm_usage, args.provider), 2),
     }
+    if args.provider == "openai":
+        report["warm_amortized_token_equivalent"] = round(
+            warm_usage["cache_read"] - 1.25 * warm_usage["cache_creation"]
+        )
     print(json.dumps(report, indent=2))
 
     if warm_usage["cache_read"] == 0:

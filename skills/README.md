@@ -43,6 +43,7 @@ That's it. The agent does the rest.
 | [opencode-mistral-cache-key](opencode-mistral-cache-key/SKILL.md) | OpenCode | No `prompt_cache_key` set for Mistral (#27556) | Enables Mistral cache discount |
 | [aider-1h-ttl](aider-1h-ttl/SKILL.md) | Aider | 5min TTL expires during long thinking pauses; keepalive pings are wasteful | Eliminates keepalive cost; survives long gaps |
 | [aider-cache-default-on](aider-cache-default-on/SKILL.md) | Aider | `--cache-prompts` is off by default | Default users get 90% discount automatically |
+| [openai-gpt56-agent-loop-cache](openai-gpt56-agent-loop-cache/SKILL.md) | Custom Responses agent harnesses | GPT-5.6 speculative writes, hot/random keys, unsafe retry fallback, and missing write telemetry | Workload-dependent; verify cache reads amortize 1.25x writes |
 
 ## Adding your own skill
 

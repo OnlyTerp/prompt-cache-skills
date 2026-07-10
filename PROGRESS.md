@@ -7,11 +7,15 @@
 ## Phase 1 — Reference docs
 
 - [x] `docs/concepts/anthropic.md` — verified 2026-05-27; pricing table added; worked example from shim
-- [x] `docs/concepts/openai.md` — verified 2026-05-27; `prompt_cache_key` Responses API trick added
+- [x] `docs/concepts/openai.md` — re-verified 2026-07-10; GPT-5.6 explicit
+  breakpoints, 1.25x writes, 30m TTL, 15 RPM/key guidance, and compaction added
+- [x] `docs/concepts/context-compaction.md` — immutable pre-cache compaction and
+  lossless artifact spooling pattern added
 - [x] `docs/concepts/gemini.md` — verified 2026-05-27; 3.5/3.0/2.5 Pro/Flash min tokens corrected
 - [ ] `docs/concepts/bedrock.md` — verify model support matrix + stamp date
 - [ ] `docs/concepts/vertex.md` — verify region availability + stamp date
-- [x] `docs/gotchas.md` — added #9b (UUID cache_key footgun)
+- [x] `docs/gotchas.md` — 24 gotchas; added GPT-5.6 write/retry/compaction
+  failures
 - [x] `docs/verification.md` — initial pass complete
 - [ ] `docs/providers/README.md` — re-check links return 200
 
