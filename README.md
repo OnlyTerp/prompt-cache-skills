@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="#how-to-use-it"><img src="https://img.shields.io/badge/Get_Started-6366f1?style=for-the-badge&logoColor=white" alt="Get Started"></a>
-  <a href="skills/README.md"><img src="https://img.shields.io/badge/13_Skills-8b5cf6?style=for-the-badge&logoColor=white" alt="13 Skills"></a>
+  <a href="skills/README.md"><img src="https://img.shields.io/badge/14_Skills-8b5cf6?style=for-the-badge&logoColor=white" alt="14 Skills"></a>
   <a href="docs/scorecard.md"><img src="https://img.shields.io/badge/13_Completed_Audits-3b82f6?style=for-the-badge&logoColor=white" alt="13 Completed Audits"></a>
   <a href="#why-this-exists"><img src="https://img.shields.io/badge/Up_to_10x_Savings-10b981?style=for-the-badge&logoColor=white" alt="10x Savings"></a>
 </p>
@@ -57,7 +57,8 @@ One row per completed audit, so the coverage matches the scorecard:
 | Antigravity | Closed desktop; no model turn captured | Cache behavior unverified | No skill; needs desktop capture |
 | Grok CLI | Documented CLI chat proxy returns non-zero `prompt_tokens_details.cached_tokens` with real CLI headers | Already gets xAI cache benefits through managed proxy | No skill; working managed proxy |
 
-13 skills total cover the verified patchable OSS bugs. See
+Thirteen harness-specific skills cover verified patchable OSS bugs, plus one
+GPT-5.6 pattern skill for custom Responses agent loops. See
 [`skills/README.md`](skills/README.md) for the full index.
 
 ---
@@ -136,7 +137,8 @@ prompt-cache-skills/
 │   ├── opencode-bedrock-doc-blocks/
 │   ├── opencode-mistral-cache-key/
 │   ├── aider-1h-ttl/
-│   └── aider-cache-default-on/
+│   ├── aider-cache-default-on/
+│   └── openai-gpt56-agent-loop-cache/
 ├── audits/                       ← evidence: completed audits + queued stubs
 │   ├── cline.md
 │   ├── roo-code.md
@@ -154,7 +156,7 @@ prompt-cache-skills/
 │   └── queued stubs: crush, goose, aichat, gptme, avante-nvim, kilo-code
 ├── docs/                         ← the underlying API mechanics
 │   ├── concepts/                 ← per-provider caching reference
-│   ├── gotchas.md                ← 16 numbered footguns
+│   ├── gotchas.md                ← 24 numbered footguns
 │   ├── verification.md           ← how to confirm caching on wire
 │   └── scorecard.md              ← completed audits graded at a glance
 ├── tools/                        ← scripts to verify caching + doc consistency
@@ -237,8 +239,9 @@ Full per-provider breakdown with file:line citations in
    implicit (best-effort, free) caching engages, even on long
    sessions with massive stable system prompts where explicit gives
    a guaranteed 75% discount.
-4. **Codex CLI is the reference for OpenAI-side caching** — thread_id
-   as cache key, preserved across compaction and into sub-agents.
+4. **Codex CLI remains the stable-key reference**, while GPT-5.6 adds
+   explicit/implicit breakpoints, 1.25x cache-write billing, and a requirement
+   to preserve opaque compaction items.
 5. **OpenCode's system-prompt split is the best Anthropic pattern.**
 6. **Hermes / Nous has real multi-provider cache plumbing** — source
    covers Anthropic/OpenRouter/Nous/Qwen and xAI wire capture showed

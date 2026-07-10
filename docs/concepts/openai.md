@@ -1,228 +1,240 @@
 # OpenAI prompt caching
 
-> Status: SCAFFOLD. Verify against
-> https://platform.openai.com/docs/guides/prompt-caching
-> before citing.
+> Verified against the official OpenAI prompt-caching and compaction
+> documentation on 2026-07-10.
 
-## TL;DR
+## Two caching generations
 
-OpenAI prompt caching is **automatic and implicit**. There is no API
-surface to enable or configure it. If your prompt prefix is ≥1024 tokens
-and byte-identical to a previous call within the cache window, you get
-cached-token pricing on the matching prefix.
+Do not treat all OpenAI models as having the same cache behavior.
 
-You cannot:
+### Models before GPT-5.6
 
-- Mark specific blocks as cacheable.
-- Choose a TTL.
-- Cache across orgs.
-- Cache prefixes shorter than 1024 tokens.
+- Prefix caching is automatic.
+- Keep the prompt prefix byte-stable.
+- `prompt_cache_key` improves routing locality on the Responses API.
+- Cache writes have no separate write fee.
+- `prompt_cache_retention` controls maximum retention on supported models.
 
-You can:
+### GPT-5.6 and later families
 
-- Structure your prompt so the prefix stays stable (the only knob you have).
+- `prompt_cache_key` is required for the more reliable implicit and explicit
+  matching path.
+- Cache writes cost **1.25x** the uncached input-token rate.
+- Cache reads are reported in `cached_tokens`.
+- Cache writes are reported in `cache_write_tokens`.
+- `prompt_cache_options.ttl` has one supported value: `30m`.
+- Explicit breakpoints are supported on Responses and Chat Completions content
+  blocks.
 
-## Mechanics
+This changes the optimization target. On GPT-5.6+, speculative cache writes can
+cost more than leaving a one-shot prefix uncached.
 
-### Minimum prefix size
+## Stable prompt cache keys
 
-1024 tokens. Below this, no caching. Above this, caching kicks in
-automatically.
+Use a deterministic key based on stable routing dimensions:
 
-### Cache key
+```python
+def prompt_cache_key(
+    *,
+    app: str,
+    model: str,
+    instructions: str,
+    role: str,
+    shard: int,
+) -> str:
+    digest = hashlib.sha256(instructions.encode("utf-8")).hexdigest()[:16]
+    return f"{app}:{model}:{digest}:{role}:s{shard}"
+```
 
-`(model, org_id, prefix bytes)`. Prefix is matched left-to-right by
-content hash, in 128-token increments past the 1024-token floor (per
-docs at time of writing — verify).
+Rules:
 
-### TTL
+1. Always include the upstream model.
+2. Keep orchestrator and worker traffic in different partitions.
+3. Map workers to a small, deterministic shard set.
+4. Never use a per-request UUID.
+5. Do not let caller-provided headers overwrite the normalized role/shard.
 
-OpenAI doesn't publish an explicit TTL. Cached prefixes are kept "for a
-period of time, typically 5-10 minutes of inactivity, but may persist
-for up to one hour during off-peak hours." Treat as 5min effective.
+OpenAI recommends keeping total traffic for each key near 15 requests per
+minute. Above that, partition across more keys with a stable mapping.
 
-### Routing
+## GPT-5.6 breakpoint mechanics
 
-OpenAI routes requests with the same prefix to the same backend pod to
-hit the local cache. Routing is org-scoped, so high-volume orgs get
-better hit rates than low-volume ones.
+Set a request-wide policy:
 
-## Pricing
-
-| Operation | Multiplier (vs base input price) |
-|-----------|----------------------------------|
-| Cache hit (cached_tokens) | 0.5x (most models) |
-| Cache miss | 1.0x |
-| Output | base output price |
-
-No write premium. This is a meaningful difference vs Anthropic: there's
-no downside to "trying" to cache, because there's no extra cost on cold
-calls.
-
-Exact discount varies by model. As of writing: most reasoning models and
-GPT-4.x get 50% discount; some newer models get 75-90%. Check pricing page.
-
-## Request shape
-
-There is no caching field. The "request shape for caching" is just:
-**keep the prefix byte-stable.**
-
-What kills the prefix:
-
-- Timestamps in the system prompt ("Today is 2026-05-27")
-- Random session IDs in the system prompt
-- Reordering tools (JSON object key order doesn't matter, but array
-  order of tools does)
-- Reformatting whitespace in tool definitions or system prompt
-- Personalization fields injected early (user names, etc.)
-
-If you must include volatile data, put it **after** the long static
-prefix, not before.
-
-## Response shape
-
-```jsonc
-"usage": {
-  "prompt_tokens": 2104,
-  "completion_tokens": 312,
-  "total_tokens": 2416,
-  "prompt_tokens_details": {
-    "cached_tokens": 1920
-  },
-  "completion_tokens_details": {
-    "reasoning_tokens": 0
+```json
+{
+  "prompt_cache_key": "my-agent:gpt-5.6:abc123:worker:s2",
+  "prompt_cache_options": {
+    "mode": "explicit",
+    "ttl": "30m"
   }
 }
 ```
 
-`prompt_tokens_details.cached_tokens` is the count served from cache.
-Note: cached_tokens are a subset of prompt_tokens, not an addition.
+Add a breakpoint to a supported content block:
 
-## Streaming
-
-Set `stream_options: {"include_usage": true}` to get `usage` in the
-final SSE chunk. Without this flag, `usage` is null on streamed responses
-and you cannot measure cache hits.
-
-## Anti-patterns
-
-### Anti-pattern 1: Injecting date into system prompt
-
-```python
-system = f"You are a helpful assistant. Today is {datetime.now():%Y-%m-%d}."
+```json
+{
+  "type": "input_text",
+  "text": "stable reusable content",
+  "prompt_cache_breakpoint": {
+    "mode": "explicit"
+  }
+}
 ```
 
-Cache invalidates at midnight. Fix: put date at the end of the user message
-or in a separate dedicated message, not in the prefix.
+Modes:
 
-### Anti-pattern 2: User personalization in system prompt
+- `explicit`: only explicit breakpoints are read/written.
+- `implicit`: OpenAI adds a breakpoint at the latest message and also uses
+  explicit breakpoints.
 
-```python
-system = f"You are {user.preferred_assistant_name}. {long_system_rules}"
+Each request can create up to four new writes. In implicit mode, the automatic
+latest-message write uses one slot.
+
+## Cost-aware agent-loop strategy
+
+A practical agent loop should distinguish one-shot tasks from continuations:
+
+1. **First turn:** use `mode: explicit` with one stable root breakpoint after
+   instructions/tool definitions.
+2. **Continuation turn:** switch to `mode: implicit` only after prior assistant
+   or tool output proves the conversation is being reused.
+3. Keep the first root breakpoint stable.
+4. Preserve append-only history after a breakpoint.
+
+This avoids paying for a unique rolling-history write on every one-shot worker,
+while long-running workers still cache their growing transcript.
+
+This adaptive strategy is a harness pattern, not an OpenAI requirement. Verify
+its economics on the target workload.
+
+## Prefix stability
+
+Cache matching remains exact-prefix matching. Stabilize:
+
+- model id;
+- instructions;
+- tool schema contents and order;
+- role markers;
+- early messages;
+- request transformations before each breakpoint.
+
+Move volatile content after the stable root:
+
+- timestamps;
+- user/session personalization;
+- task-specific instructions;
+- random request ids;
+- transient status text.
+
+Canonicalize tool schemas once, then freeze them for the agent's lifetime. Do
+not prune or reorder the tool list differently on every turn.
+
+## Cache usage fields
+
+Responses API:
+
+```json
+{
+  "usage": {
+    "input_tokens": 10000,
+    "output_tokens": 500,
+    "input_tokens_details": {
+      "cached_tokens": 8000,
+      "cache_write_tokens": 1000
+    }
+  }
+}
 ```
 
-Different cache key per user, regardless of how many users share the
-long rules. Fix: put user name in the first user message; keep system
-prompt user-agnostic.
+Chat Completions uses `prompt_tokens`, `completion_tokens`, and
+`prompt_tokens_details`.
 
-### Anti-pattern 3: Dict-ordered tool serialization
-
-In Python <3.7 (and some JS engines), `json.dumps(tools)` could emit
-keys in different order across runs. Fix: `json.dumps(tools, sort_keys=True)`.
-
-### Anti-pattern 4: Re-fetching system prompt per call
-
-Some harnesses fetch the system prompt from a database or remote URL
-per call. If the source returns slightly different bytes (line endings,
-trailing whitespace, locale differences), cache misses every call. Fix:
-fetch once, hash it, log the hash, alert on drift.
-
-## What does NOT cache
-
-- Prefixes shorter than 1024 tokens.
-- Across orgs.
-- Across models.
-- After the cache TTL expires.
-- When prefix bytes differ at all (even whitespace).
-
-## The `prompt_cache_key` trick (Responses API)
-
-The OpenAI **Responses API** (`/v1/responses`, used by Codex CLI, the
-ChatGPT backend, and most agent harnesses targeting `gpt-5.x` /
-reasoning models) accepts a `prompt_cache_key` field that the public
-docs barely mention. It's the single biggest hidden lever in OpenAI
-caching.
-
-### What it does
-
-OpenAI's automatic prefix caching is hash-routed to a specific
-backend pod. Without `prompt_cache_key`, the request gets hashed by
-content alone and may land on any pod. With `prompt_cache_key`, OpenAI
-uses it as the routing hint — same key = same pod = warm cache.
-
-### What kills cache hits silently
-
-Many harnesses pass a per-request UUID as the cache key (sometimes via
-a `session_id` header, sometimes via `prompt_cache_key`):
+For OpenAI-shaped usage, cached tokens are already included in input/prompt
+tokens:
 
 ```python
-# BAD — different every request
-prompt_cache_key = str(uuid.uuid4())
+token_hit_rate = cached_tokens / max(1, input_tokens)
 ```
 
-This is worse than not setting the field at all: it forces routing to
-random pods, and you get cold-cache pricing on every call. Measured
-impact: 0% cache hit rate on multi-turn agent loops where prefix-only
-caching would have given 70-90%.
+Do not add `cached_tokens` to `input_tokens` in the denominator.
 
-### The fix: stable instruction-hash keys
+Track:
 
-Hash the stable parts of the prompt (system instructions, model slug)
-and use that as the key:
+- token hit ratio;
+- request hit ratio;
+- write tokens;
+- read tokens;
+- requests per cache key;
+- approximate amortization:
 
 ```python
-def _prompt_cache_key(*, model_slug: str, composed_instructions: str) -> str:
-    digest = hashlib.sha256(composed_instructions.encode("utf-8")).hexdigest()[:16]
-    return f"droid:{model_slug}:{digest}"
+amortized_token_equivalent = cached_tokens - 1.25 * cache_write_tokens
 ```
 
-Now every request with the same system prompt + model routes to the
-same pod and shares a cache.
+This is directional telemetry, not a dollar invoice.
 
-### For Codex backend specifically
+## Compatibility fallback
 
-The ChatGPT Codex backend (`chatgpt.com/backend-api/codex`) reads the
-cache key from BOTH `prompt_cache_key` in the body AND `session_id` in
-headers. Set them to the same value:
+Some OpenAI-compatible or managed backends may accept `prompt_cache_key` but
+reject newer GPT-5.6 fields.
 
-```python
-headers["session_id"] = cache_key
-body["prompt_cache_key"] = cache_key
-```
+Safe fallback:
 
-Measured result on a multi-worker pipeline (3 parallel workers, same
-system prompt, varying user prompts): 75-91% cache_input_token hit
-rates against OpenAI. Achieved purely from stable-prefix bootstrap
-bytes (system prompt + base instructions + handoff schema) — no
-explicit `cache_control` markers (OpenAI doesn't support them anyway).
+1. Send the breakpoint request.
+2. Retry once only when HTTP 400 identifies
+   `prompt_cache_options`/`prompt_cache_breakpoint` as an unknown or unsupported
+   parameter.
+3. Strip only the new cache fields.
+4. Disable the unsupported feature for that model/process.
+5. Do not fallback on generic validation errors.
 
-### When the field doesn't exist (Chat Completions)
+Never retry because a breakpoint was placed illegally. Fix the payload instead.
 
-The legacy Chat Completions API (`/v1/chat/completions`) doesn't accept
-`prompt_cache_key`. Auto-prefix caching still works, but you have no
-routing control. Stick to byte-stable prefixes.
+## Retry accounting
+
+An empty response is not necessarily free. If any of these happened, do not
+automatically regenerate:
+
+- `response.created` or another generation-start event arrived;
+- a response/output item arrived;
+- usage reports non-zero input, output, cache-read, or cache-write tokens.
+
+Retrying a usage-only empty response can consume two or three full generations
+while appearing to be a harmless reliability feature.
+
+Compatibility fallback is different: a pre-stream 400 for an unsupported field
+can be retried once with the field removed.
+
+## Compaction
+
+OpenAI supports:
+
+- server-side compaction through
+  `context_management: [{"type": "compaction", "compact_threshold": N}]`;
+- standalone `POST /responses/compact`.
+
+The returned compaction item is opaque machine state. Preserve it byte-for-byte
+and pass it into the next Responses request. For stateless input-array chaining,
+append response output items, including compaction items. After a compaction
+item exists, old items before the latest compaction item can be dropped.
+
+Do not enable server compaction through a Chat Completions bridge that discards
+unknown output items. The next turn would lose the state the compaction item was
+supposed to carry.
+
+See [context compaction](context-compaction.md) for pre-cache local compaction
+and lossless artifact spooling.
 
 ## References
 
-- https://platform.openai.com/docs/guides/prompt-caching
-- https://openai.com/index/api-prompt-caching/ (announcement)
-- Responses API reference (`prompt_cache_key`):
-  https://platform.openai.com/docs/api-reference/responses/create
+- <https://developers.openai.com/api/docs/guides/prompt-caching>
+- <https://developers.openai.com/api/docs/guides/compaction>
+- <https://developers.openai.com/api/docs/guides/deployment-checklist>
+- <https://developers.openai.com/cookbook/examples/prompt_caching_201>
+- <https://developers.openai.com/api/reference/resources/responses/methods/create/>
 
 ---
 
-_Last verified: 2026-05-27. The 1024-token minimum, byte-identity rule,
-and 5-10min idle TTL are documented. The `prompt_cache_key` Responses
-API field is verified against live ChatGPT Codex backend traffic — it
-is real and load-bearing. The "no write premium" claim is structurally
-true (OpenAI doesn't bill differently for first vs subsequent calls)._
+_Last verified: 2026-07-10._

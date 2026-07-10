@@ -59,6 +59,24 @@ class TestExtractUsage:
             "output": 312,
         }
 
+    def test_openai_gpt56_responses_full(self) -> None:
+        resp = {
+            "usage": {
+                "input_tokens": 10000,
+                "output_tokens": 500,
+                "input_tokens_details": {
+                    "cached_tokens": 8000,
+                    "cache_write_tokens": 1000,
+                },
+            }
+        }
+        assert cc.extract_usage("openai", resp) == {
+            "input": 10000,
+            "cache_creation": 1000,
+            "cache_read": 8000,
+            "output": 500,
+        }
+
     def test_openai_null_details(self) -> None:
         resp = {
             "usage": {
@@ -125,6 +143,14 @@ class TestHitRate:
         rate = cc.hit_rate(usage)
         assert rate == 50.0
 
+    def test_openai_input_already_includes_cached_and_written(self) -> None:
+        usage = {
+            "input": 10000,
+            "cache_creation": 1000,
+            "cache_read": 8000,
+        }
+        assert cc.hit_rate(usage, "openai") == 80.0
+
 
 # ---------------------------------------------------------------------------
 # caller env-var guards
@@ -146,6 +172,22 @@ class TestCallerEnvGuards:
             with pytest.raises(SystemExit, match="GEMINI_API_KEY"):
                 cc.call_gemini({"model": "test"})
 
+    def test_openai_responses_shape_selects_responses_endpoint(self) -> None:
+        body = {"model": "gpt-5.6", "input": "hello", "_api": "responses"}
+        with patch.dict(os.environ, {"OPENAI_API_KEY": "test"}):
+            with patch.object(cc, "_http", return_value={}) as http:
+                cc.call_openai(body)
+        assert http.call_args.args[0].endswith("/v1/responses")
+        assert "_api" not in http.call_args.args[2]
+        assert body["_api"] == "responses"
+
+    def test_openai_chat_shape_selects_chat_endpoint(self) -> None:
+        body = {"model": "gpt-4.1", "messages": []}
+        with patch.dict(os.environ, {"OPENAI_API_KEY": "test"}):
+            with patch.object(cc, "_http", return_value={}) as http:
+                cc.call_openai(body)
+        assert http.call_args.args[0].endswith("/v1/chat/completions")
+
 
 # ---------------------------------------------------------------------------
 # main() — argument parsing and body loading
@@ -160,24 +202,24 @@ class TestMain:
     def test_invalid_json_body(self) -> None:
         with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             f.write("not json {{{")
-            f.flush()
-            try:
-                with patch("sys.argv", ["check_cache.py", "--provider", "anthropic", "--body", f.name]):
-                    with pytest.raises(SystemExit, match="invalid JSON"):
-                        cc.main()
-            finally:
-                os.unlink(f.name)
+            path = f.name
+        try:
+            with patch("sys.argv", ["check_cache.py", "--provider", "anthropic", "--body", path]):
+                with pytest.raises(SystemExit, match="invalid JSON"):
+                    cc.main()
+        finally:
+            os.unlink(path)
 
     def test_non_object_body(self) -> None:
         with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             json.dump([1, 2, 3], f)
-            f.flush()
-            try:
-                with patch("sys.argv", ["check_cache.py", "--provider", "anthropic", "--body", f.name]):
-                    with pytest.raises(SystemExit, match="body must be a JSON object"):
-                        cc.main()
-            finally:
-                os.unlink(f.name)
+            path = f.name
+        try:
+            with patch("sys.argv", ["check_cache.py", "--provider", "anthropic", "--body", path]):
+                with pytest.raises(SystemExit, match="body must be a JSON object"):
+                    cc.main()
+        finally:
+            os.unlink(path)
 
 
 # ---------------------------------------------------------------------------

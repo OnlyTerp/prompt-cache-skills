@@ -77,33 +77,37 @@ On a steady-state agent loop you want this >0.8.
 
 ## OpenAI
 
-### 7. Caching is automatic but byte-identical-prefix-only
+### 7. Assuming every OpenAI model uses the pre-GPT-5.6 cache API
 
-There is no `cache_control`. You don't opt in. But:
+Older OpenAI models use automatic exact-prefix caching. GPT-5.6 and later add
+explicit content-block breakpoints, `prompt_cache_options`, a supported
+30-minute TTL value, and cache-write billing.
 
-- Prefix must be ≥1024 tokens.
-- Prefix must be byte-identical across calls (same model, same
-  org-scoped routing).
-- Any change to the system prompt, tool definitions, or earliest message
-  invalidates everything after it.
+Both generations still require exact matching at each cached prefix. Any change
+to the system prompt, tool definitions, or earliest message can invalidate
+everything after it.
 
 If your harness injects the current timestamp into the system prompt
 ("Today's date is 2026-05-27"), congratulations: you have a cache that
 expires daily.
 
-### 8. The cached_tokens field is on a different path
+### 8. The cache fields are nested and API-shaped
 
 ```python
 response.usage.prompt_tokens_details.cached_tokens
 ```
 
-Not `response.usage.cached_tokens`. Easy to miss; many "we don't get
-cache hits" reports were just reading the wrong field.
+Responses uses `input_tokens_details`; Chat Completions commonly uses
+`prompt_tokens_details`. GPT-5.6+ also reports `cache_write_tokens`.
 
-### 9. No write premium, but also no API control
+Not `response.usage.cached_tokens`. Easy to miss; many "we don't get cache
+hits" reports were just reading the wrong field.
 
-You can't extend TTL, can't mark specific blocks, can't choose a
-breakpoint. If the prefix structure isn't stable, you're stuck.
+### 9. Assuming OpenAI cache writes are always free
+
+Models before GPT-5.6 do not have a separate cache-write fee. GPT-5.6 and later
+bill cache writes at 1.25x the uncached input rate. A breakpoint that is never
+read again is more expensive than leaving that prefix uncached.
 
 ### 9b. `prompt_cache_key` set to a random UUID
 
@@ -121,9 +125,7 @@ digest = hashlib.sha256(composed_instructions.encode("utf-8")).hexdigest()[:16]
 prompt_cache_key = f"<your-app>:<model>:{digest}"
 ```
 
-See [`concepts/openai.md`](concepts/openai.md) "The `prompt_cache_key`
-trick" for the full pattern. Measured impact: 0% → 75-91% cache hit
-rate on multi-worker agent pipelines.
+See [`concepts/openai.md`](concepts/openai.md) for the full pattern.
 
 ## Gemini
 
@@ -176,3 +178,61 @@ hitting.
 OpenAI prefix caching is org-scoped. Running the same prompt across two
 org IDs (e.g., personal + work) caches separately. Anthropic is
 account-scoped similarly.
+
+### 17. GPT-5.6 cache writes are not free
+
+`prompt_cache_options.mode: implicit` writes the latest message. On a one-shot
+worker, that unique task/history prefix may never be read. Use root-only
+`explicit` mode until the same conversation proves it has a continuation.
+
+### 18. One cache key for an entire swarm
+
+OpenAI recommends keeping total traffic for each key near 15 requests/minute.
+One key for 50 concurrent workers spills traffic away from the warm cache.
+
+Partition by model and role, then map workers deterministically across a small
+shard set.
+
+### 19. Too many shards
+
+Random or excessive shards have the opposite problem: each partition stays
+cold. Increase shards only when per-key request rate is too high.
+
+### 20. Retrying after usage
+
+A response can contain no visible text/tool call but still report input,
+reasoning, output, or cache-write usage. Retrying that response can double or
+triple provider consumption.
+
+Do not retry after a generation-start event, output item, or non-zero usage.
+
+### 21. Broad HTTP 400 cache fallback
+
+Stripping cache fields after every `invalid_request_error` can hide malformed
+breakpoint placement.
+
+Fallback once only when the structured error identifies the new cache field as
+unknown or unsupported.
+
+### 22. Compaction after the cache write
+
+If history is compacted differently on a later turn, the exact prefix changes
+and the earlier cache is invalidated.
+
+Compact before the first write. Keep the compacted representation immutable.
+
+### 23. Discarding opaque compaction items
+
+OpenAI server-side/standalone compaction returns an opaque compaction item.
+Dropping it in a Chat Completions translator loses the state needed for the next
+Responses turn.
+
+Preserve and replay it byte-for-byte or do not enable server compaction.
+
+### 24. Truncating evidence with no recovery path
+
+Plain head/tail truncation saves tokens but can delete the only useful line.
+Prefer lossless compression by indirection: store complete text in a local
+content-addressed artifact and put its path/hash in the short prompt preview.
+
+See [context compaction](concepts/context-compaction.md).
