@@ -73,7 +73,7 @@ it pays back after the second cache hit — which any multi-turn agent
 session clears trivially. A caching system that requires opt-in is a
 caching system most users won't use.
 
-Cline / Roo / OpenCode all default-on caching. Aider being default-off
+Cline / Zoo Code / OpenCode all default-on caching. Aider being default-off
 is an anomaly more than a deliberate design choice.
 
 Full audit: [audits/aider.md](../../audits/aider.md).

@@ -28,14 +28,17 @@ That's it. The agent does the rest.
 
 ## Index
 
+The index contains 12 current skills and one historical compatibility
+skill for archived Roo Code checkouts.
+
 | Skill | Harness | What it fixes | Estimated savings |
 |-------|---------|---------------|-------------------|
 | [cline-fix-volatile-msg](cline-fix-volatile-msg/SKILL.md) | Cline | Burns 1 of 3 Anthropic cache breakpoints every turn on the volatile current user message | ~30% wasted cache write premium per turn |
 | [cline-openai-cache-key](cline-openai-cache-key/SKILL.md) | Cline | OpenAI native provider sends no `prompt_cache_key` — 0% cache hit | 50-90% input discount on OpenAI calls |
 | [cline-pin-timestamp](cline-pin-timestamp/SKILL.md) | Cline | System-prompt timestamp may invalidate cache | Restores system-prompt cache reads |
-| [roo-fix-volatile-msg](roo-fix-volatile-msg/SKILL.md) | Roo Code | Same volatile-msg bug as Cline | Same as Cline fix |
-| [roo-bedrock-custom-arn](roo-bedrock-custom-arn/SKILL.md) | Roo Code | Bedrock custom ARN silently disables caching (#11983) | Enables Bedrock caching for custom ARNs |
-| [continue-fix-volatile-msg](continue-fix-volatile-msg/SKILL.md) | Continue | Same volatile-msg bug as Cline / Roo | Same as Cline fix |
+| [zoo-fix-volatile-msg](zoo-fix-volatile-msg/SKILL.md) | [Zoo Code](https://github.com/Zoo-Code-Org/Zoo-Code) | Same volatile-msg bug as Cline | Same as Cline fix |
+| [roo-bedrock-custom-arn](roo-bedrock-custom-arn/SKILL.md) | Roo Code (archived) | Historical Bedrock custom ARN bug (#11983); not applicable to current Zoo Code | Archived Roo Code checkouts only |
+| [continue-fix-volatile-msg](continue-fix-volatile-msg/SKILL.md) | Continue | Same volatile-msg bug as Cline / Zoo Code | Same as Cline fix |
 | [continue-enable-defaults](continue-enable-defaults/SKILL.md) | Continue | Caching is opt-in by default; most users never enable it | 90% discount for every user who hasn't manually configured it |
 | [continue-gemini-explicit](continue-gemini-explicit/SKILL.md) | Continue | Gemini `cachedContents` API completely unimplemented | Enables explicit Gemini caching |
 | [opencode-detect-openai-compat](opencode-detect-openai-compat/SKILL.md) | OpenCode | OpenAI-compatible proxies routing to Anthropic send wrong cache shape (#25984, #26460) | Cache works through LiteLLM/Bifrost/MiMo |

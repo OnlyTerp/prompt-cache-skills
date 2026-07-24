@@ -44,4 +44,4 @@ PRs without verification evidence will be closed without merge. See
 
 ## Affected harnesses / providers
 
-<!-- e.g. Cline + Anthropic; Roo Code + Bedrock; Continue + Gemini -->
+<!-- e.g. Cline + Anthropic; Zoo Code + Bedrock; Continue + Gemini -->

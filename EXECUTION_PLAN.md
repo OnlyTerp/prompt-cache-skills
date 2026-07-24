@@ -14,11 +14,12 @@ its own. Skills, not benchmarks; audits are the proof, not the product.
   Gemini) on 2026-05-27 with shim-derived worked examples folded in.
 - 13 completed harness audits: the default Claude Desktop Code baseline
   verified from clean Mac cache counters, source-recon audits for Codex
-  CLI, Aider, OpenCode, Roo Code, Cline, and Continue, plus extended
+  CLI, Aider, OpenCode, Roo Code (now archived and succeeded by Zoo
+  Code), Cline, and Continue, plus extended
   source/wire/local-install audits for Hermes/Nous, Codex Desktop,
   Devin CLI, Windsurf/Cascade, Antigravity, and Grok CLI. Six more
   `audits/` files are queued stubs, not completed audits.
-- 13 atomic skills covering the highest-impact fixes across Cline, Roo,
+- 13 atomic skills covering the highest-impact fixes across Cline, Zoo Code,
   Continue, OpenCode, Aider. All in [`skills/`](skills/).
 - `tools/check_cache.py` — zero-dep wire-verification tool.
 - Top-level `AGENTS.md` so an agent dropped into this repo knows what
@@ -56,7 +57,7 @@ its own. Skills, not benchmarks; audits are the proof, not the product.
 
 - [ ] Submit upstream PRs for the highest-impact skills:
   - Cline: volatile-msg fix + OpenAI cache key
-  - Roo: Bedrock custom-ARN (PR #11984 is already partially this)
+  - Zoo Code: volatile-message breakpoint fix
   - Continue: default-on caching
   - OpenCode: openai-compat detection (#25984, #26460)
   - Aider: default-on + 1h TTL flag

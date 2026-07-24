@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Current product references now point to Zoo Code, the community
+  successor to archived Roo Code; historical audit and compatibility
+  identifiers remain labeled as such.
 - LICENSE copyright holder referenced stale project name
   (`prompt-cache-audit` → `prompt-cache-skills`).
 - README and `skills/README.md` used `<owner>` / `<this-repo>`

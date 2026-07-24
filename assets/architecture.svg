@@ -41,7 +41,7 @@
       <text x="-80" y="24" font-family="'Courier New', monospace" font-size="11" fill="#c7d2fe">cline-fix-volatile-msg/</text>
       <text x="-80" y="43" font-family="'Courier New', monospace" font-size="11" fill="#c7d2fe">cline-openai-cache-key/</text>
       <text x="-80" y="62" font-family="'Courier New', monospace" font-size="11" fill="#c7d2fe">cline-pin-timestamp/</text>
-      <text x="-80" y="81" font-family="'Courier New', monospace" font-size="11" fill="#c7d2fe">roo-fix-volatile-msg/</text>
+      <text x="-80" y="81" font-family="'Courier New', monospace" font-size="11" fill="#c7d2fe">zoo-fix-volatile-msg/</text>
       <text x="-80" y="100" font-family="'Courier New', monospace" font-size="11" fill="#c7d2fe">roo-bedrock-custom-arn/</text>
       <text x="-80" y="119" font-family="'Courier New', monospace" font-size="11" fill="#c7d2fe">continue-fix-volatile/</text>
       <text x="-80" y="138" font-family="'Courier New', monospace" font-size="11" fill="#c7d2fe">continue-enable-def/</text>

@@ -15,7 +15,9 @@
 ## Notes pre-audit
 
 Emerging agent harness (Cline-family fork). Same audit pattern as Cline
-and Roo. Diff against Cline at audit time and note divergences.
+and [Zoo Code](https://github.com/Zoo-Code-Org/Zoo-Code), the community
+successor to archived Roo Code. Diff against Cline at audit time and
+note divergences.
 
 ## Source / Wire / Verdict / Patch / Reproduction
 

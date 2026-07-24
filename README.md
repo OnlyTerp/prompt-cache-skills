@@ -17,7 +17,7 @@
 
 ---
 
-Most popular OSS agent harnesses (Cline, Roo Code, Continue, OpenCode,
+Most popular OSS agent harnesses (Cline, Zoo Code, Continue, OpenCode,
 Aider) leave **30-90% off your API bill** on the table because their
 prompt-caching code is subtly wrong, off-by-default, or just missing
 for some providers.
@@ -47,7 +47,7 @@ One row per completed audit, so the coverage matches the scorecard:
 | Codex CLI | Correct OpenAI cache design: stable `thread_id` cache key | Already gets OpenAI cache benefits | No skill; reference implementation |
 | Aider | `--cache-prompts` off by default; 5min TTL/keepalive overhead | Many users get 0% cache reads unless they opt in; shorter cache window | Skills: default-on caching + 1h TTL |
 | OpenCode | Strong Anthropic path, but proxy/Bedrock edge cases exist | Some OpenAI-compatible→Anthropic/Bedrock routes miss cache | Skills: proxy detection + Bedrock doc-block fix |
-| Roo Code | Anthropic volatile-message bug; Bedrock custom ARN gap | Wastes breakpoints; custom ARNs can drop to 0% cache reads | Skills: volatile-msg fix + Bedrock custom ARN fix |
+| [Zoo Code](https://github.com/Zoo-Code-Org/Zoo-Code) | Anthropic volatile-message bug; OpenAI Native omits `prompt_cache_key` | Wastes a breakpoint; OpenAI relies on automatic prefix caching without a routing hint | Skill: volatile-msg fix; OpenAI gap documented |
 | Cline | Anthropic volatile-message bug; OpenAI lacks `prompt_cache_key` | Wastes Anthropic breakpoint; OpenAI native can get 0% cache reads | Skills: volatile-msg fix + OpenAI cache key + timestamp pin |
 | Continue | Cache opt-in default; Gemini explicit caching missing; volatile-message bug | Many users get 0% cache reads; Gemini relies on implicit luck | Skills: default-on + volatile-msg + Gemini explicit cache |
 | Hermes / Nous | Multi-provider cache plumbing works; xAI wire showed cached tokens | No verified savings bug in this audit | No skill; working audit |
@@ -57,7 +57,8 @@ One row per completed audit, so the coverage matches the scorecard:
 | Antigravity | Closed desktop; no model turn captured | Cache behavior unverified | No skill; needs desktop capture |
 | Grok CLI | Documented CLI chat proxy returns non-zero `prompt_tokens_details.cached_tokens` with real CLI headers | Already gets xAI cache benefits through managed proxy | No skill; working managed proxy |
 
-13 skills total cover the verified patchable OSS bugs. See
+12 current skills plus one archived Roo Code compatibility skill cover
+the verified patchable OSS bugs. See
 [`skills/README.md`](skills/README.md) for the full index.
 
 ---
@@ -127,7 +128,7 @@ prompt-cache-skills/
 │   ├── cline-fix-volatile-msg/
 │   ├── cline-openai-cache-key/
 │   ├── cline-pin-timestamp/
-│   ├── roo-fix-volatile-msg/
+│   ├── zoo-fix-volatile-msg/
 │   ├── roo-bedrock-custom-arn/
 │   ├── continue-fix-volatile-msg/
 │   ├── continue-enable-defaults/
@@ -197,7 +198,7 @@ right. This repo does that work for you.
   <img src="assets/scorecard.svg" alt="Audit scorecard — 13 harnesses grouped by cache status: working, needs fixes, and unverified" width="900">
 </p>
 
-13 completed harness audits, dated 2026-05-27. The original 7 include the default Claude Desktop Code baseline, source-recon audits for Codex CLI, Aider, OpenCode, Roo Code, Cline, and Continue, plus extended source/wire/local-install audits for Hermes/Nous, Codex Desktop, Devin CLI, Windsurf/Cascade, Antigravity, and Grok CLI. Six more files in `audits/` are queued stubs, not completed audits.
+13 completed harness audits, dated 2026-05-27. The original 7 include the default Claude Desktop Code baseline, source-recon audits for Codex CLI, Aider, OpenCode, Roo Code (now archived and succeeded by Zoo Code), Cline, and Continue, plus extended source/wire/local-install audits for Hermes/Nous, Codex Desktop, Devin CLI, Windsurf/Cascade, Antigravity, and Grok CLI. Six more files in `audits/` are queued stubs, not completed audits.
 
 | Harness | Anthropic | OpenAI | Bedrock | Gemini | Managed/other |
 |---------|-----------|--------|---------|--------|---------------|
@@ -205,7 +206,7 @@ right. This repo does that work for you.
 | Codex CLI | n/a | **working** | n/a | n/a | n/a |
 | Aider | working | automatic | n/a | n/a | n/a |
 | OpenCode | working | working | partial | n/a | n/a |
-| Roo Code | partial | working | partial | n/a | n/a |
+| [Zoo Code](https://github.com/Zoo-Code-Org/Zoo-Code) | partial | partial | working in current source | n/a | n/a |
 | Cline | partial | **broken** | unverified | n/a | n/a |
 | Continue | partial | partial | partial | broken | n/a |
 | Hermes / Nous | **working** | working (Responses) | n/a | unverified | xAI working |
@@ -229,7 +230,7 @@ Full per-provider breakdown with file:line citations in
 </p>
 
 1. **The "last 2 user messages" pattern is a copy-paste bug** that
-   propagated Cline → Roo → Continue. All three burn a breakpoint on
+   propagated Cline → Zoo Code → Continue. All three burn a breakpoint on
    the volatile current turn. Same one-line fix in each.
 2. **Cline OpenAI native is silently broken** — no `prompt_cache_key`,
    no prefix-stability work. Users on Cline+OpenAI pay full price.

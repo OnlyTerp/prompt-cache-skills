@@ -36,7 +36,7 @@ EXPECTED_README_ROWS = [
     "Codex CLI",
     "Aider",
     "OpenCode",
-    "Roo Code",
+    "[Zoo Code](https://github.com/Zoo-Code-Org/Zoo-Code)",
     "Cline",
     "Continue",
     "Hermes / Nous",
