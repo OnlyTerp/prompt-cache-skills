@@ -61,10 +61,10 @@
 
     <line x1="20" y1="72" x2="780" y2="72" stroke="#3d2a0a" stroke-width="0.5"/>
 
-    <text x="20" y="92" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="600" fill="#e2e8f0">Roo Code</text>
+    <text x="20" y="92" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="600" fill="#e2e8f0">Zoo Code</text>
     <rect x="215" y="78" width="56" height="20" rx="10" fill="#f59e0b" fill-opacity="0.15" stroke="#f59e0b" stroke-width="0.8" stroke-opacity="0.4"/>
     <text x="243" y="92" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="11" font-weight="600" fill="#fcd34d">partial</text>
-    <text x="285" y="92" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#94a3b8">Anthropic volatile-msg bug · Bedrock custom ARN gap · 2 skills</text>
+    <text x="285" y="92" font-family="'Segoe UI', system-ui, sans-serif" font-size="12" fill="#94a3b8">Anthropic volatile-msg · OpenAI no cache key · Bedrock ARN works · 1 skill</text>
 
     <line x1="20" y1="102" x2="780" y2="102" stroke="#3d2a0a" stroke-width="0.5"/>
 
@@ -75,7 +75,7 @@
 
     <line x1="20" y1="132" x2="780" y2="132" stroke="#3d2a0a" stroke-width="0.5"/>
 
-    <text x="20" y="143" font-family="'Segoe UI', system-ui, sans-serif" font-size="10" fill="#fcd34d" font-style="italic">These 3 harnesses account for all 13 skills in this repo</text>
+    <text x="20" y="143" font-family="'Segoe UI', system-ui, sans-serif" font-size="10" fill="#fcd34d" font-style="italic">12 current skills plus 1 archived Roo Code compatibility skill</text>
   </g>
 
   <!-- TIER 3: Unverified -->

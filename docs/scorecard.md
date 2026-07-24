@@ -2,7 +2,8 @@
 
 > Audit set dated 2026-05-27: 13 completed audits. The original 7
 > include the default Claude Desktop Code baseline plus source-recon
-> audits for Codex CLI, Aider, OpenCode, Roo Code, Cline, and Continue.
+> audits for Codex CLI, Aider, OpenCode, Roo Code (now archived and
+> succeeded by Zoo Code), Cline, and Continue.
 > The extended 6 add source/wire/local-install audits for managed or
 > desktop surfaces. The repo also contains 6 queued audit stubs that are
 > not counted here. Hit-rate columns are absent for the original
@@ -10,6 +11,10 @@
 > Claude Desktop Code is the exception, backed by clean default Mac
 > Desktop Code logs and cache-usage counters rather than public source
 > lines.
+
+Zoo Code rows were rechecked against `Zoo-Code-Org/Zoo-Code` commit
+`2634d5c` on 2026-07-24. The linked Roo Code audit remains the dated
+lineage record.
 
 ## Anthropic providers
 
@@ -19,7 +24,7 @@
 | OpenCode | yes | 4 (system×2 split, last 2 msgs) | 5min / 1h flag | partial | **working** | [`../audits/opencode.md`](../audits/opencode.md) |
 | Aider | yes (--cache-prompts) | 4 (system, repo-map, files, current) | 5min | no | **working** | [`../audits/aider.md`](../audits/aider.md) |
 | Cline | yes | 3 (system, last 2 user msgs) | 5min | **yes** | **partial** | [`../audits/cline.md`](../audits/cline.md) |
-| Roo Code | yes | 3 (system, last 2 user msgs) | 5min | **yes** | **partial** | [`../audits/roo-code.md`](../audits/roo-code.md) |
+| [Zoo Code](https://github.com/Zoo-Code-Org/Zoo-Code) | yes | 3 (system, last 2 user msgs) | 5min | **yes** | **partial** | [historical Roo Code audit](../audits/roo-code.md) |
 | Continue | yes (config-gated, off by default) | 3 (system, last 2 user msgs) | 5min | **yes** | **partial** | [`../audits/continue.md`](../audits/continue.md) |
 | Hermes / Nous | yes | 4 (system + last 3) | 5min / 1h config | no source evidence of volatile bug | **working** | [`../audits/hermes-nous.md`](../audits/hermes-nous.md) |
 
@@ -33,7 +38,7 @@ and whether they set `prompt_cache_key` to a stable value.
 | Codex CLI | yes | stable (`thread_id`) | yes (`base_instructions`) | **working** | [`../audits/codex-cli.md`](../audits/codex-cli.md) |
 | Codex Desktop | inferred via `session_id` / `x-client-request-id` | stable thread id | inherited from Codex backend | **working (inferred)** | [`../audits/codex-desktop.md`](../audits/codex-desktop.md) |
 | Aider | n/a (Chat Completions; auto) | n/a | yes (no timestamp pollution) | **automatic** | [`../audits/aider.md`](../audits/aider.md) |
-| Roo Code | yes | stable (sha256 of system + first msg) | yes | **working** | [`../audits/roo-code.md`](../audits/roo-code.md) |
+| [Zoo Code](https://github.com/Zoo-Code-Org/Zoo-Code) | no | n/a | likely stable; relies on automatic caching | **partial** | [historical Roo Code audit](../audits/roo-code.md) |
 | OpenCode | yes | unverified (likely stable) | yes (with system split) | **working** | [`../audits/opencode.md`](../audits/opencode.md) |
 | Continue | no | n/a | unverified | **partial** | [`../audits/continue.md`](../audits/continue.md) |
 | Cline | **no** | n/a | unverified | **broken** | [`../audits/cline.md`](../audits/cline.md) |
@@ -48,7 +53,7 @@ hardcode `cache_control` will silently not cache here.
 | OpenCode | yes (broken on DocumentBlocks #17300) | n/a | **partial** | [`../audits/opencode.md`](../audits/opencode.md) |
 | Continue | yes | n/a | **partial** | [`../audits/continue.md`](../audits/continue.md) |
 | Cline | yes (but gated, incomplete impl) | n/a | **unverified** | [`../audits/cline.md`](../audits/cline.md) |
-| Roo Code | yes for declared models | **broken** for custom ARNs (#11983) | **partial** | [`../audits/roo-code.md`](../audits/roo-code.md) |
+| [Zoo Code](https://github.com/Zoo-Code-Org/Zoo-Code) | yes | current source carries default cache metadata into custom-ARN model guesses | **working** | [historical Roo Code audit](../audits/roo-code.md) |
 
 ## Gemini
 
@@ -74,7 +79,7 @@ Top-level `prompt_cache_ttl` is silently dropped (OpenCode #16848).
 | Harness | OpenRouter Anthropic | OpenRouter Gemini | Verdict | Audit |
 |---------|---------------------|-------------------|---------|-------|
 | OpenCode | yes (content-level ttl) | yes (PR #20266 Vertex) | **working** | [`../audits/opencode.md`](../audits/opencode.md) |
-| Roo Code | yes (delegates via transform module) | yes | **working** | [`../audits/roo-code.md`](../audits/roo-code.md) |
+| [Zoo Code](https://github.com/Zoo-Code-Org/Zoo-Code) | yes (delegates via transform module) | yes | **working** | [historical Roo Code audit](../audits/roo-code.md) |
 | Cline | yes (Anthropic + MiniMax detected) | unverified | **partial** | [`../audits/cline.md`](../audits/cline.md) |
 
 ## Managed / closed-provider surfaces
@@ -91,18 +96,19 @@ Top-level `prompt_cache_ttl` is silently dropped (OpenCode #16848).
 ## Headline findings
 
 1. **The "last 2 user messages" pattern is a copy-paste mistake** that
-   has propagated through Cline → Roo → Continue. All three burn a
+   has propagated through Cline → Zoo Code → Continue. All three burn a
    breakpoint on the volatile current user turn. Fix is the same diff
    in each.
 
 2. **OpenAI Chat Completions caching is silently broken in Cline.**
    No `prompt_cache_key`, no prefix-stability work — users on OpenAI
-   via Cline are paying full price. Roo fixed this; Cline upstream
-   hasn't.
+   via Cline rely on automatic prefix caching without the stronger
+   routing hint. Current Zoo Code has the same gap; the archived Roo
+   audit's deterministic key is no longer present.
 
 3. **Bedrock detection is fragile everywhere.** OpenCode misses
-   OpenAI-compatible proxies routing to Bedrock; Roo misses custom
-   ARNs; Cline's Bedrock impl is incomplete. None of the auditors
+   OpenAI-compatible proxies routing to Bedrock; Zoo Code's current
+   source handles custom ARNs; Cline's Bedrock impl is incomplete. None of the auditors
    appears to have great test coverage for Bedrock paths.
 
 4. **Gemini explicit caching is universally unimplemented.** Every
@@ -119,7 +125,7 @@ Top-level `prompt_cache_ttl` is silently dropped (OpenCode #16848).
 6. **OpenCode's system-prompt split is the best Anthropic pattern.**
    Two breakpoints on the static-vs-dynamic system split lets the
    tools+global-config half live in a long-lived cache while
-   per-project context drifts independently. Worth porting to Cline/Roo.
+   per-project context drifts independently. Worth porting to Cline/Zoo Code.
 
 7. **Continue requires explicit opt-in.** Default is no caching. For
    the median user this means the harness is leaving 90% input
@@ -142,6 +148,6 @@ Top-level `prompt_cache_ttl` is silently dropped (OpenCode #16848).
 2. **OpenCode** — 4 breakpoints with system split; experimental 1h TTL flag
 3. **Claude Desktop Code** — clean default Mac Desktop Code logs verify cache reads and cache creation
 4. **Codex CLI** — for OpenAI workloads, top of class
-5. **Roo Code** — partial; volatile-msg bug; ahead of Cline on OpenAI
+5. **[Zoo Code](https://github.com/Zoo-Code-Org/Zoo-Code)** — partial; volatile-msg bug; OpenAI relies on automatic caching
 6. **Cline** — partial; same volatile-msg bug; broken OpenAI native
 7. **Continue** — works only when explicitly configured; default off

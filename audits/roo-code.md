@@ -1,5 +1,11 @@
 # Roo Code
 
+> **Historical audit.** Roo Code is archived. Its own
+> [archival disclaimer](https://github.com/RooCodeInc/Roo-Code#disclaimer)
+> identifies [Zoo Code](https://github.com/Zoo-Code-Org/Zoo-Code) as
+> the community successor. Names, repository coordinates, issue IDs,
+> and findings below describe Roo Code v3.54.0 at the audit date.
+
 | Field | Value |
 |-------|-------|
 | Repo | `RooCodeInc/Roo-Code` |

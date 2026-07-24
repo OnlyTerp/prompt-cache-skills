@@ -101,5 +101,9 @@ class TestMarkdownFiles:
         for p in cdc.markdown_files():
             assert ".git" not in p.parts
 
+    def test_excludes_node_modules(self) -> None:
+        for p in cdc.markdown_files():
+            assert "node_modules" not in p.parts
+
     def test_nonempty(self) -> None:
         assert len(cdc.markdown_files()) > 0

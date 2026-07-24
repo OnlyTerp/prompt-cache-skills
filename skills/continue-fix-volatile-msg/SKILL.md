@@ -22,7 +22,7 @@ function is `addCacheControlToLastTwoUserMessages` (Anthropic) and
 ## Symptom
 
 Same as [`cline-fix-volatile-msg`](../cline-fix-volatile-msg/SKILL.md)
-and [`roo-fix-volatile-msg`](../roo-fix-volatile-msg/SKILL.md):
+and [`zoo-fix-volatile-msg`](../zoo-fix-volatile-msg/SKILL.md):
 Continue caches the last 2 USER messages, including the current
 user turn which changes every request. Pays write premium for zero
 reads on that breakpoint every turn.
@@ -75,7 +75,7 @@ Wire-level assertion is identical: turn-2
 
 ## Background
 
-This is the third instance of the same copy-paste bug (Cline → Roo →
+This is the third instance of the same copy-paste bug (Cline → Zoo Code →
 Continue). Apply this skill alongside
 [`continue-enable-defaults`](../continue-enable-defaults/SKILL.md)
 so users don't get the bug surfaced by the default-on change.

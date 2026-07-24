@@ -1,24 +1,25 @@
 ---
-name: roo-fix-volatile-msg
-description: Roo Code inherits Cline's volatile-message cache bug. Same fix shape, inline location.
-target_harness: Roo Code
-target_repo: RooCodeInc/Roo-Code
+name: zoo-fix-volatile-msg
+description: Zoo Code inherits the Cline-family volatile-message cache bug. Same fix shape, inline location.
+target_harness: Zoo Code
+target_repo: Zoo-Code-Org/Zoo-Code
 target_files:
   - src/api/providers/anthropic.ts
-target_commit: main @ v3.54.0 (verify current at apply time)
+target_commit: main @ 2634d5c (2026-07-24; verify current at apply time)
 estimated_savings: ~30% wasted cache write premium eliminated per turn
 ---
 
-# Roo Code: fix volatile-message cache thrash
+# Zoo Code: fix volatile-message cache thrash
 
 ## Target
 
-`src/api/providers/anthropic.ts` in `RooCodeInc/Roo-Code`.
+`src/api/providers/anthropic.ts` in `Zoo-Code-Org/Zoo-Code`.
 
-Permalink: https://github.com/RooCodeInc/Roo-Code/blob/main/src/api/providers/anthropic.ts
+Permalink: https://github.com/Zoo-Code-Org/Zoo-Code/blob/main/src/api/providers/anthropic.ts
 
-Roo is a Cline fork that inlined Cline's helper instead of factoring
-it out. Same bug, slightly different code location.
+Zoo Code is the community successor to the archived Roo Code fork. It
+retains the inlined Cline-family helper and the same bug in a slightly
+different code location.
 
 ## Symptom
 
@@ -85,4 +86,4 @@ Settings path differs but the wire-level assertion is identical.
 ## Background
 
 See the parent skill for the full reasoning. Full audit:
-[audits/roo-code.md](../../audits/roo-code.md).
+historical [Roo Code audit](../../audits/roo-code.md).

@@ -1,6 +1,6 @@
 ---
 name: roo-bedrock-custom-arn
-description: Roo Code's Bedrock provider silently disables caching for custom ARNs. Populate cachableFields to fix.
+description: Historical Roo Code Bedrock custom-ARN fix for archived checkouts; current Zoo Code no longer has this symptom.
 target_harness: Roo Code
 target_repo: RooCodeInc/Roo-Code
 target_files:
@@ -10,6 +10,11 @@ estimated_savings: Enables Bedrock prompt caching for custom ARN setups (current
 ---
 
 # Roo Code: Bedrock custom ARN caching (#11983)
+
+> **Historical compatibility skill.** Roo Code was archived after this
+> skill was written. Its community successor, [Zoo Code](https://github.com/Zoo-Code-Org/Zoo-Code),
+> now carries cache metadata from the default model into custom-ARN
+> model guesses, so this diff must not be applied to current Zoo Code.
 
 ## Target
 

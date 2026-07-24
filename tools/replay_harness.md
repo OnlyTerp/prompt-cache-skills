@@ -22,7 +22,7 @@ Pick whichever the harness supports, in order of preference:
 
 Many harnesses let you override the provider endpoint:
 
-- Cline / Roo: settings → "Anthropic Base URL" → `http://127.0.0.1:8090`
+- Cline / Zoo Code: settings → "Anthropic Base URL" → `http://127.0.0.1:8090`
 - Aider: `--openai-api-base http://127.0.0.1:8090/v1`
 - Continue: `apiBase` field in config
 - Generic Anthropic SDK: `ANTHROPIC_BASE_URL=http://127.0.0.1:8090`
