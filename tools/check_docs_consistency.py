@@ -84,11 +84,7 @@ def fail(message: str) -> None:
 
 
 def markdown_files() -> list[Path]:
-    return [
-        p
-        for p in ROOT.rglob("*.md")
-        if ".git" not in p.parts and "node_modules" not in p.parts
-    ]
+    return [p for p in ROOT.rglob("*.md") if ".git" not in p.parts]
 
 
 def audit_sets() -> tuple[list[str], list[str], list[Path]]:
