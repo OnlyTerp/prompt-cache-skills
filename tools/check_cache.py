@@ -4,18 +4,38 @@ check_cache.py — fire a request body at a provider twice and report
 cache behavior.
 
 Usage:
-  check_cache.py --provider anthropic --body req.json
-  check_cache.py --provider openai    --body req.json
-  check_cache.py --provider gemini    --body req.json
+  check_cache.py --provider anthropic  --body req.json
+  check_cache.py --provider openai     --body req.json
+  check_cache.py --provider gemini     --body req.json
+  check_cache.py --provider deepseek   --body req.json
+  check_cache.py --provider openrouter --body req.json
+  check_cache.py --provider xai        --body req.json
+  check_cache.py --provider custom     --body req.json \
+                 --base-url https://relay.example/v1/chat/completions
 
 Reads provider credentials from env:
   ANTHROPIC_API_KEY
   OPENAI_API_KEY
   GEMINI_API_KEY (or GOOGLE_API_KEY)
+  DEEPSEEK_API_KEY
+  OPENROUTER_API_KEY
+  XAI_API_KEY
+  CUSTOM_API_KEY (used with --provider custom)
 
-For Bedrock/Vertex, configure via the respective SDKs' standard env vars
-(AWS_*, GOOGLE_APPLICATION_CREDENTIALS) and use --provider bedrock /
---provider vertex.
+All OpenAI-compatible providers (openai/deepseek/openrouter/xai/custom)
+accept both nested `usage.prompt_tokens_details.cached_tokens` (OpenAI
+shape) and DeepSeek-style top-level `usage.prompt_cache_hit_tokens`,
+whichever the backend returns.
+
+OpenRouter only reports usage accounting when the request body asks for
+it — the `usage: {"include": true}` field is injected automatically
+unless the body already sets `usage`.
+
+Bedrock and Vertex use SDK credential chains and signed requests that
+this script deliberately does not reimplement — capture those bodies via
+your harness or mitmproxy and replay them with `--provider custom`
+against an OpenAI-compatible relay, or audit them with the harness's own
+SDK in a one-off script.
 
 The script:
   1. Sends the request body once (cold).
@@ -26,8 +46,8 @@ The script:
        - Warm turn cache_creation / cache_read / input
        - Computed hit rate
 
-It does NOT modify the request body. If you want to test what *your*
-harness sends, capture a request via mitmproxy, save the body to
+It does NOT otherwise modify the request body. If you want to test what
+*your* harness sends, capture a request via mitmproxy, save the body to
 req.json, and run this against it.
 """
 
@@ -38,7 +58,7 @@ import json
 import os
 import sys
 import time
-from typing import Any
+from typing import Any, Callable
 
 import urllib.request
 import urllib.error
@@ -73,15 +93,69 @@ def call_anthropic(body: dict[str, Any]) -> dict[str, Any]:
     return _http("https://api.anthropic.com/v1/messages", headers, body)
 
 
+def _openai_compat(
+    base_url: str, key_env: str, extra_headers: dict[str, str] | None = None
+) -> Callable[[dict[str, Any]], dict[str, Any]]:
+    def _call(body: dict[str, Any]) -> dict[str, Any]:
+        key = os.environ.get(key_env)
+        if not key:
+            raise SystemExit(f"{key_env} not set")
+        headers = {
+            "authorization": f"Bearer {key}",
+            "content-type": "application/json",
+        }
+        if extra_headers:
+            headers.update(extra_headers)
+        return _http(base_url, headers, body)
+
+    return _call
+
+
 def call_openai(body: dict[str, Any]) -> dict[str, Any]:
-    key = os.environ.get("OPENAI_API_KEY")
-    if not key:
-        raise SystemExit("OPENAI_API_KEY not set")
-    headers = {
-        "authorization": f"Bearer {key}",
-        "content-type": "application/json",
-    }
-    return _http("https://api.openai.com/v1/chat/completions", headers, body)
+    return _openai_compat(
+        "https://api.openai.com/v1/chat/completions", "OPENAI_API_KEY"
+    )(body)
+
+
+def call_deepseek(body: dict[str, Any]) -> dict[str, Any]:
+    return _openai_compat(
+        "https://api.deepseek.com/chat/completions", "DEEPSEEK_API_KEY"
+    )(body)
+
+
+def call_openrouter(body: dict[str, Any]) -> dict[str, Any]:
+    # OpenRouter reports zero usage accounting unless the body opts in.
+    # Inject the opt-in when the caller didn't set it (the tool's whole
+    # job is measuring usage).
+    if "usage" not in body:
+        body = dict(body)
+        body["usage"] = {"include": True}
+    extra = {}
+    referer = os.environ.get("OPENROUTER_SITE_URL")
+    if referer:
+        extra["HTTP-Referer"] = referer
+    title = os.environ.get("OPENROUTER_SITE_NAME")
+    if title:
+        extra["X-Title"] = title
+    return _openai_compat(
+        "https://openrouter.ai/api/v1/chat/completions",
+        "OPENROUTER_API_KEY",
+        extra_headers=extra,
+    )(body)
+
+
+def call_xai(body: dict[str, Any]) -> dict[str, Any]:
+    return _openai_compat("https://api.x.ai/v1/chat/completions", "XAI_API_KEY")(
+        body
+    )
+
+
+CUSTOM_BASE_URL = "https://set-via---base-url/invalid"
+
+
+def call_custom(body: dict[str, Any]) -> dict[str, Any]:
+    base = os.environ.get("CHECK_CACHE_BASE_URL", CUSTOM_BASE_URL)
+    return _openai_compat(base, "CUSTOM_API_KEY")(body)
 
 
 def call_gemini(body: dict[str, Any]) -> dict[str, Any]:
@@ -96,11 +170,17 @@ def call_gemini(body: dict[str, Any]) -> dict[str, Any]:
     return _http(url, {"content-type": "application/json"}, body)
 
 
-CALLERS = {
+CALLERS: dict[str, Callable[[dict[str, Any]], dict[str, Any]]] = {
     "anthropic": call_anthropic,
     "openai": call_openai,
+    "deepseek": call_deepseek,
+    "openrouter": call_openrouter,
+    "xai": call_xai,
     "gemini": call_gemini,
+    "custom": call_custom,
 }
+
+OPENAI_COMPAT_PROVIDERS = {"openai", "deepseek", "openrouter", "xai", "custom"}
 
 
 def extract_usage(provider: str, resp: dict[str, Any]) -> dict[str, int]:
@@ -112,13 +192,16 @@ def extract_usage(provider: str, resp: dict[str, Any]) -> dict[str, int]:
             "cache_read": u.get("cache_read_input_tokens", 0),
             "output": u.get("output_tokens", 0),
         }
-    if provider == "openai":
-        u = resp.get("usage", {})
+    if provider in OPENAI_COMPAT_PROVIDERS:
+        u = resp.get("usage", {}) or {}
         details = u.get("prompt_tokens_details", {}) or {}
+        # OpenAI shape nests it; DeepSeek returns top-level counters.
+        # Nested wins when both exist. `or 0` also normalizes null.
+        cache_read = details.get("cached_tokens") or u.get("prompt_cache_hit_tokens") or 0
         return {
             "input": u.get("prompt_tokens", 0),
-            "cache_creation": 0,  # OpenAI has no write premium / explicit creation count
-            "cache_read": details.get("cached_tokens", 0),
+            "cache_creation": 0,  # no write premium / explicit creation count
+            "cache_read": int(cache_read),
             "output": u.get("completion_tokens", 0),
         }
     if provider == "gemini":
@@ -143,8 +226,17 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--provider", required=True, choices=sorted(CALLERS))
     ap.add_argument("--body", required=True, help="path to JSON request body")
+    ap.add_argument(
+        "--base-url",
+        default=None,
+        help="override endpoint (required for --provider custom; also "
+        "honored via CHECK_CACHE_BASE_URL env)",
+    )
     ap.add_argument("--sleep", type=float, default=1.0, help="seconds between cold and warm")
     args = ap.parse_args()
+
+    if args.provider == "custom" and not args.base_url:
+        raise SystemExit("--provider custom requires --base-url (an OpenAI-compatible chat/completions URL)")
 
     try:
         with open(args.body) as f:
@@ -156,6 +248,9 @@ def main() -> int:
 
     if not isinstance(body, dict):
         raise SystemExit(f"body must be a JSON object, got {type(body).__name__}")
+
+    if args.base_url:
+        os.environ["CHECK_CACHE_BASE_URL"] = args.base_url
 
     caller = CALLERS[args.provider]
 
