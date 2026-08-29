@@ -4,10 +4,11 @@ description: Ladder-aware Roo Code Anthropic caching — verify the rolling read
 target_harness: Roo Code
 target_repo: RooCodeInc/Roo-Code
 target_files:
+  - src/api/transform/caching/anthropic.ts
   - src/api/providers/anthropic.ts
   - src/api/providers/anthropic-vertex.ts
   - src/api/providers/minimax.ts
-target_commit: main @ v3.54.0-era (ladder comment verified 2026-08-28)
+target_commit: v3.54.0 (ladder verified live 2026-08-28; transform moved to src/api/transform/caching/)
 estimated_savings: avoids a harmful "fix" + protects Vertex 4-block budget
 ---
 
@@ -23,9 +24,11 @@ estimated_savings: avoids a harmful "fix" + protects Vertex 4-block budget
 
 ## Target
 
-`src/api/providers/anthropic.ts` in `RooCodeInc/Roo-Code`.
+`src/api/transform/caching/anthropic.ts` in `RooCodeInc/Roo-Code`
+(moved there by v3.54.0 — the ladder function `addCacheBreakpoints`
+lives in that file now; `src/api/providers/anthropic.ts` calls it).
 
-Permalink: https://github.com/RooCodeInc/Roo-Code/blob/main/src/api/providers/anthropic.ts
+Permalink: https://github.com/RooCodeInc/Roo-Code/blob/v3.54.0/src/api/transform/caching/anthropic.ts
 
 ## What Roo actually does
 
