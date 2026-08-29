@@ -1,18 +1,26 @@
 # Google Gemini prompt caching
 
-> Status: SCAFFOLD. Verify against
-> https://ai.google.dev/gemini-api/docs/caching
-> before citing.
+> Status: VERIFIED. Numbers reflect https://ai.google.dev/gemini-api/docs/caching
+> as of 2026-08-28 (fetched copy in the 2026-08 research ledger).
 
 ## TL;DR
 
 Gemini has **two** caching modes:
 
-1. **Implicit caching** — automatic, free, on Gemini 2.5 series. No setup.
-   Returns `cachedContentTokenCount` in `usageMetadata` when it engages.
+1. **Implicit caching** — automatic, free, on Gemini 2.5+ and Gemini 3
+   series. No setup. Returns `cachedContentTokenCount` in
+   `usageMetadata` when it engages.
 2. **Explicit caching** — `cachedContents.create()` returns a named
    cache object you reference in subsequent requests. Has minimum sizes
-   and an explicit TTL. Charged for storage duration.
+   and an explicit TTL. **Charged for storage duration** (per the
+   current docs page, storage cost applies to explicit caches).
+
+**2026 change:** implicit caching is no longer described as completely
+free — the docs now say implicit caching carries a **price
+modification** per model, with a multiplier table published per model
+on the pricing page rather than a flat "free" claim. Treat implicit
+hit discounts as model-specific; verify the current multiplier before
+citing savings.
 
 Most use cases want implicit. Use explicit only when (a) you need
 guaranteed cache hits across long gaps, or (b) you're on a model where
@@ -22,10 +30,9 @@ implicit isn't available.
 
 ### Model support
 
-- Gemini 3.5 Flash: enabled by default
+- Gemini 3.5 Flash / 3.5 Pro: enabled by default
 - Gemini 3 Pro Preview: enabled by default
-- Gemini 2.5 Pro: enabled by default
-- Gemini 2.5 Flash: enabled by default
+- Gemini 2.5 Pro / Flash: enabled by default
 - Older (1.x, 2.0) models: not supported
 
 ### Mechanics
@@ -33,11 +40,12 @@ implicit isn't available.
 Automatic. Google's infrastructure detects repeated prefixes and serves
 them from a fast path. No API parameter to enable or disable.
 
-### Minimums (verified 2026-05-27 against ai.google.dev docs)
+### Minimums (verified 2026-08-28 against ai.google.dev docs)
 
 | Model | Min tokens for implicit cache |
 |-------|------------------------------|
 | Gemini 3.5 Flash | 1024 |
+| Gemini 3.5 Pro | 4096 |
 | Gemini 3 Pro Preview | 4096 |
 | Gemini 2.5 Flash | 1024 |
 | Gemini 2.5 Pro | 4096 |
@@ -51,8 +59,10 @@ recommends: (a) put large/common content at the start of the prompt,
 
 ### Pricing
 
-Implicit cache hits are **free** (no charge for the cached tokens).
-You only pay for the uncached prefix and the output.
+Implicit cache hits carry a **price modification** — historically a
+75% discount (0.25x) on cached tokens, but the current docs direct you
+to a per-model multiplier table on the pricing page instead of a flat
+number. Verify the specific model's multiplier before quoting savings.
 
 ### Response shape
 
@@ -120,11 +130,13 @@ You can update TTL via `caches.update()` without re-uploading the content.
 
 ### Pricing
 
-- **Cached input tokens**: 0.25x the standard input price.
-- **Storage**: per-hour-per-token charge while the cache exists.
+- **Cached input tokens**: 0.25x the standard input price (verify
+  per-model — see the implicit-caching pricing note above).
+- **Storage**: per-hour-per-token charge while the cache exists
+  (explicit caches only).
 
-The storage cost means an unused cache still costs money. Delete or set
-short TTL on caches you don't expect to reuse.
+The storage cost means an unused explicit cache still costs money.
+Delete or set short TTL on caches you don't expect to reuse.
 
 ### Response shape
 
@@ -170,7 +182,9 @@ cached, not the file reference.
 
 ---
 
-_Last verified against Gemini docs: 2026-05-27. Min token counts for
-3.5/3.0/2.5 Pro/Flash families verified against ai.google.dev/gemini-api/docs/caching.
-Default explicit-cache TTL is 1 hour. Implicit caching has "no cost
-saving guarantee" per Google — pricing benefit is best-effort._
+_Last verified against Gemini docs: 2026-08-28 (2026-08 research
+ledger). Min token counts for 3.5/3.0/2.5 Pro/Flash families verified
+against ai.google.dev/gemini-api/docs/caching. Default explicit-cache
+TTL is 1 hour. Implicit caching pricing moved from "free" to a
+per-model price-modification multiplier table in 2026 docs — the flat
+"no cost saving guarantee" footnote from May 2026 is superseded._

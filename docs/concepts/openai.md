@@ -1,45 +1,59 @@
 # OpenAI prompt caching
 
-> Status: SCAFFOLD. Verify against
-> https://platform.openai.com/docs/guides/prompt-caching
-> before citing.
+> Status: VERIFIED. Numbers reflect https://platform.openai.com/docs/guides/prompt-caching
+> as of 2026-08-28 (fetched copy in the 2026-08 research ledger).
 
 ## TL;DR
 
-OpenAI prompt caching is **automatic and implicit**. There is no API
-surface to enable or configure it. If your prompt prefix is ≥1024 tokens
-and byte-identical to a previous call within the cache window, you get
-cached-token pricing on the matching prefix.
+OpenAI prompt caching has **two mechanisms** as of GPT-5.6:
+
+1. **Automatic prefix caching** (always on): if your prompt prefix is
+   ≥1024 tokens (GPT-5.6+) or ≥2048 (older models) and byte-identical
+   to a recent call, you get cached-token pricing on the matching
+   prefix. Implicit breakpoints are "spaced at regular, model-dependent
+   intervals" of 48 tokens.
+2. **Explicit breakpoints** (NEW, GPT-5.6 and later only): mark blocks
+   with `prompt_cache_breakpoint` and control retention with
+   `prompt_cache_options.ttl` (`30m` — the only supported value, and
+   the default) or `prompt_cache_retention` (`in_memory` / `24h`).
 
 You cannot:
 
-- Mark specific blocks as cacheable.
-- Choose a TTL.
-- Cache across orgs.
-- Cache prefixes shorter than 1024 tokens.
+- Cache across orgs (cache key includes org).
+- Use explicit breakpoints on models older than GPT-5.6.
 
 You can:
 
-- Structure your prompt so the prefix stays stable (the only knob you have).
+- Structure the prefix to stay byte-stable (still the highest-leverage knob).
+- Route deterministically with `prompt_cache_key` (Chat Completions AND
+  Responses API — it's no longer Responses-only).
+- Set `prompt_cache_options.mode` to `implicit` (default: automatic
+  breakpoint on latest message + explicit ones) or `explicit` (only
+  explicit breakpoints used).
 
 ## Mechanics
 
 ### Minimum prefix size
 
-1024 tokens. Below this, no caching. Above this, caching kicks in
-automatically.
+1,024 tokens for GPT-5.6 and later; 2,048 for older models. Tokens in
+OpenAI-provided hidden system content don't count toward the minimum.
 
 ### Cache key
 
 `(model, org_id, prefix bytes)`. Prefix is matched left-to-right by
-content hash, in 128-token increments past the 1024-token floor (per
-docs at time of writing — verify).
+content hash, in 128-token increments past the minimum floor.
 
-### TTL
+### TTL (2026 verified)
 
-OpenAI doesn't publish an explicit TTL. Cached prefixes are kept "for a
-period of time, typically 5-10 minutes of inactivity, but may persist
-for up to one hour during off-peak hours." Treat as 5min effective.
+- **`prompt_cache_options.ttl`** (GPT-5.6+): only supported value is
+  `30m`, also the default. "A cached prefix remains eligible for reuse
+  for 30 minutes after its most recent write or reuse, though OpenAI
+  may retain it longer."
+- **`prompt_cache_retention`** (earlier models): `in_memory` ("typically
+  remain active for around 5 to 10 minutes of inactivity, up to one
+  hour") or `24h` ("typically keeps entries available for around 30
+  minutes and can retain them for up to 24 hours"). ZDR orgs default
+  to `in_memory`; others default to `24h`.
 
 ### Routing
 
@@ -49,23 +63,42 @@ better hit rates than low-volume ones.
 
 ## Pricing
 
-| Operation | Multiplier (vs base input price) |
-|-----------|----------------------------------|
-| Cache hit (cached_tokens) | 0.5x (most models) |
-| Cache miss | 1.0x |
-| Output | base output price |
+| Operation | GPT-5.6+ | Older models |
+|-----------|----------|--------------|
+| Cache hit (`cached_tokens`) | 0.1x | 0.5x (most models; some 0.25-0.75x) |
+| Cache write | 1.25x (NEW — GPT-5.6+ bills a write premium) | none (no write charge) |
+| Cache miss | 1.0x | 1.0x |
+| Output | base output price | base output price |
 
-No write premium. This is a meaningful difference vs Anthropic: there's
-no downside to "trying" to cache, because there's no extra cost on cold
-calls.
+**2026 change:** GPT-5.6 and later bill cache WRITES at 1.25x —
+"Writing a prefix once and fully reusing it once costs 1.35× its
+ordinary [input cost]." The old "no write premium" claim is now only
+true for pre-5.6 models. Break-even on GPT-5.6 is ~2 reads of a
+written prefix.
 
-Exact discount varies by model. As of writing: most reasoning models and
-GPT-4.x get 50% discount; some newer models get 75-90%. Check pricing page.
+Price rows (per 1M, short context — input / cached / cache write /
+output): gpt-5.6-sol $2.00/$0.20/$2.50/$10.00; gpt-5.6-terra
+$1.00/$0.10/$1.25/$6.00; gpt-5.6-luna $0.10/$0.01/$0.125/$0.60.
+Sol promotional pricing runs at least through November 21, 2026.
 
-## Request shape
+## Request shape (2026)
 
-There is no caching field. The "request shape for caching" is just:
-**keep the prefix byte-stable.**
+```jsonc
+{
+  "model": "gpt-5.6-sol",
+  "prompt_cache_key": "shared-workflow-v1",
+  "prompt_cache_options": { "mode": "implicit", "ttl": "30m" },
+  "messages": [...]
+}
+```
+
+`prompt_cache_key` now works on BOTH Chat Completions and Responses
+API. Explicit breakpoint marker (GPT-5.6+, content blocks):
+
+```jsonc
+{ "type": "text", "text": "...",
+  "prompt_cache_breakpoint": { "mode": "explicit" } }
+```
 
 What kills the prefix:
 
@@ -204,13 +237,40 @@ Measured result on a multi-worker pipeline (3 parallel workers, same
 system prompt, varying user prompts): 75-91% cache_input_token hit
 rates against OpenAI. Achieved purely from stable-prefix bootstrap
 bytes (system prompt + base instructions + handoff schema) — no
-explicit `cache_control` markers (OpenAI doesn't support them anyway).
+explicit breakpoint markers (unnecessary with stable prefixes).
 
-### When the field doesn't exist (Chat Completions)
+### When the field doesn't exist (pre-5.6 Chat Completions)
 
-The legacy Chat Completions API (`/v1/chat/completions`) doesn't accept
-`prompt_cache_key`. Auto-prefix caching still works, but you have no
-routing control. Stick to byte-stable prefixes.
+Very old models ignore `prompt_cache_key` on Chat Completions.
+Auto-prefix caching still works, but you have no routing control.
+Stick to byte-stable prefixes.
+
+### Structured-outputs stability caveat
+
+Documented on the current page: when the JSON schema changes between
+requests, cached prefixes that embed the serialized schema (or
+tool-selection logic derived from it) are invalidated. Keep schema
+definitions byte-stable across a session; treat schema edits as cache
+busting.
+
+## GPT-5.6 cache efficiency discipline (2026 guidance)
+
+From the official guide: at most **one explicit breakpoint per
+request**, placed at the boundary between the most stable and most
+volatile prompt section (typically after the system prompt, before the
+chat history). "Automatically inserted implicit breakpoints are
+disabled when using explicit breakpoints." With `mode: explicit`, only
+explicit breakpoints are used.
+
+`prompt_cache_options.mode`:
+- `implicit` (default): automatic breakpoint on the latest message +
+  any explicit breakpoints. If only the automatic one is set, it
+  behaves as a normal automatic breakpoint.
+- `explicit`: only explicit breakpoints are used — no automatic
+  writes. This is how you opt OUT of write premiums on chat history
+  while keeping a system-prompt breakpoint.
+
+`prompt_cache_options.ttl`: `30m` only (the default).
 
 ## References
 
@@ -221,8 +281,10 @@ routing control. Stick to byte-stable prefixes.
 
 ---
 
-_Last verified: 2026-05-27. The 1024-token minimum, byte-identity rule,
-and 5-10min idle TTL are documented. The `prompt_cache_key` Responses
-API field is verified against live ChatGPT Codex backend traffic — it
-is real and load-bearing. The "no write premium" claim is structurally
-true (OpenAI doesn't bill differently for first vs subsequent calls)._
+_Last verified: 2026-08-28 (2026-08 research ledger). Pre-5.6 claims
+(1024-token minimum, byte-identity rule, 5-10min idle TTL,
+`prompt_cache_key` Responses API) carried from the 2026-05-27
+verification against live ChatGPT Codex backend traffic. GPT-5.6+
+claims (explicit breakpoints, 1.25x write premium, 0.1x hit discount,
+`prompt_cache_options`, Chat Completions `prompt_cache_key`) verified
+against the fetched 2026-08 prompt-caching guide._

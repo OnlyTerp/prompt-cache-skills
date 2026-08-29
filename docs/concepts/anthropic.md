@@ -1,8 +1,9 @@
 # Anthropic prompt caching
 
-> Status: SCAFFOLD. Numbers here reflect Anthropic's documented behavior
-> as of the last edit (see footer). Verify against
-> https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching
+> Status: VERIFIED. Numbers reflect Anthropic's documented behavior as of
+> 2026-08-28 (full citation set in
+> `C:\Users\User\prompt-cache-research-2026-08\prompt-caching-state-2026-08.md`).
+> Verify against https://platform.claude.com/docs/en/build-with-claude/prompt-caching
 > before citing in an audit.
 
 ## TL;DR
@@ -45,16 +46,37 @@ and including that point.
 ### Breakpoint limit
 
 **4 `cache_control` markers per request.** Hard limit. Returns 400 if
-exceeded.
+exceeded. With automatic caching enabled, the auto breakpoint consumes
+one of the 4 slots.
+
+### The 20-block lookback window
+
+Prefix matching looks back **~20 content blocks** from your cache
+checkpoint. Put the breakpoint at the END of static content; anything
+relevant more than ~20 blocks before the marker may fall outside the
+lookup window. (Same rule on Bedrock.)
 
 ### TTL
 
 - **5 minutes** (default ephemeral). Refreshed on every cache hit.
-- **1 hour** (beta). Requires:
+- **1 hour** (GA via beta header). Requires:
   - Header: `anthropic-beta: extended-cache-ttl-2025-04-11`
   - Block: `cache_control: {"type": "ephemeral", "ttl": "1h"}`
 
-Both TTLs are sliding: each read resets the timer.
+Both TTLs are sliding: each read resets the timer. A cache entry's
+lifetime is measured from the START of the request that writes or
+reads it.
+
+### Mixed-TTL edge cases (2026-08 verified)
+
+- Automatic + explicit breakpoint with the SAME TTL on the last block
+  → automatic marker is a no-op.
+- Different TTLs on the same last block → **400 error**.
+- 4 explicit breakpoints already present + automatic enabled → **400
+  error** (no slot left for the auto marker).
+- Automatic caching is NOT available on the legacy Amazon Bedrock
+  (Opus 4.6-and-earlier) integration — top-level `cache_control`
+  there returns 400.
 
 ## Pricing
 
@@ -71,18 +93,29 @@ Break-even on a 5min cache: a written block pays for itself after roughly
 
 For 1h: roughly 4 reads to break even.
 
-### Actual prices (Claude 4.x family, USD per MTok)
+### Actual prices (current Claude family, USD per MTok)
 
 | Model | Base input | 5m write | 1h write | Cache hit |
 |-------|-----------|----------|----------|-----------|
-| Opus 4.7 | $5.00 | $6.25 | $10.00 | $0.50 |
-| Opus 4.6 | $5.00 | $6.25 | $10.00 | $0.50 |
-| Opus 4.5 | $5.00 | $6.25 | $10.00 | $0.50 |
-| Opus 4.1 | $15.00 | $18.75 | $30.00 | $1.50 |
-| Sonnet 4.6 | $3.00 | $3.75 | $6.00 | $0.30 |
+| Fable 5 | $10.00 | $12.50 | $20.00 | $1.00 |
+| Mythos 5 | $10.00 | $12.50 | $20.00 | $1.00 |
+| Opus 5 | $5.00 | $6.25 | $10.00 | $0.50 |
+| Opus 4.8/4.7/4.6/4.5 | $5.00 | $6.25 | $10.00 | $0.50 |
+| Sonnet 5 | $2.00 | $2.50 | $4.00 | $0.20 |
+| Sonnet 4.6 & 4.5 | $3.00 | $3.75 | $6.00 | $0.30 |
+| Haiku 4.5 | $1.00 | $1.25 | $2.00 | $0.10 |
 
-(Verified against Anthropic pricing page 2026-05-27. Older Sonnet/Haiku
+Opus 4.1/4 and Sonnet 4 are retired (except Bedrock / Google Cloud).
+Multipliers stack with Batch API and data-residency modifiers.
+
+(Verified against Anthropic pricing 2026-08-28. Older Sonnet/Haiku
 not listed but follow the same 1.25x/2.0x/0.1x ratios.)
+
+### Minimum cacheable length (per model, 2026-08 verified)
+
+512 tokens (Opus 5, Fable 5, Mythos 5) · 1,024 (Opus 4.8, Sonnet 5/4.6/4.5)
+· 2,048 (Mythos Preview, Opus 4.7) · 4,096 (Opus 4.6/4.5, Haiku 4.5).
+Shorter prompts are silently NOT cached — no error is returned.
 
 ## Request shape
 
@@ -118,9 +151,36 @@ the most recent stable turn boundary.
   "input_tokens": 23,
   "cache_creation_input_tokens": 0,
   "cache_read_input_tokens": 11890,
+  "cache_creation": {
+    "ephemeral_5m_input_tokens": 0,
+    "ephemeral_1h_input_tokens": 0
+  },
   "output_tokens": 412
 }
 ```
+
+`cache_creation_input_tokens` equals the SUM of the two
+`cache_creation` sub-fields. Use the sub-fields to attribute write
+premium by TTL tier.
+
+### Cache diagnostics (beta)
+
+Anthropic offers a beta that compares consecutive requests and reports
+exactly where the prompt prefix diverged — the fastest way to find
+what's thrashing your cache. Beta header string not confirmed in
+fetched docs (UNVERIFIED); check the current prompt-caching page.
+
+### Interactions that invalidate the cache (2026-08 verified)
+
+- `tool_choice` changes → invalidate.
+- Image presence changes → invalidate.
+- **Context editing** (`context-management-2025-06-27` beta):
+  tool-result clearing invalidates prefixes at the cleared point (and
+  re-writes cost cache-write premium); thinking-block clearing
+  invalidates at the cleared point, but keeping thinking blocks
+  preserves the cache.
+- The memory tool (`memory_20250818`) makes no documented
+  caching-interaction guarantees — treat as neutral, verify on wire.
 
 See [`../verification.md`](../verification.md) for how to interpret.
 
@@ -269,13 +329,14 @@ on turn 2.
 
 ## References
 
-- https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching
+- https://platform.claude.com/docs/en/build-with-claude/prompt-caching
 - https://www.anthropic.com/news/prompt-caching (announcement)
-- 1h beta: https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching#1-hour-cache-duration-beta
+- Context editing: https://platform.claude.com/docs/en/build-with-claude/context-editing
 
 ---
 
-_Last verified against Anthropic docs: 2026-05-27. Pricing multipliers
-(1.25x write, 0.1x read for 5min; 2x write for 1h) and the 4-breakpoint
-limit are stable since the August 2024 GA. Beta header name verified
-against live shim traffic._
+_Last verified against Anthropic docs: 2026-08-28 (research lane,
+23-source cited ledger). Pricing multipliers (1.25x/2x write, 0.1x
+read), the 4-breakpoint limit, automatic top-level `cache_control`,
+the 20-block lookback, and mixed-TTL 400 edge cases are verified
+against the live docs._
