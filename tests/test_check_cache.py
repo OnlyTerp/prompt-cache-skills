@@ -158,26 +158,28 @@ class TestMain:
                 cc.main()
 
     def test_invalid_json_body(self) -> None:
+        # NOTE: close the temp file BEFORE main() opens it and before
+        # os.unlink() — on Windows the open handle causes WinError 32.
         with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+            name = f.name
             f.write("not json {{{")
-            f.flush()
-            try:
-                with patch("sys.argv", ["check_cache.py", "--provider", "anthropic", "--body", f.name]):
-                    with pytest.raises(SystemExit, match="invalid JSON"):
-                        cc.main()
-            finally:
-                os.unlink(f.name)
+        try:
+            with patch("sys.argv", ["check_cache.py", "--provider", "anthropic", "--body", name]):
+                with pytest.raises(SystemExit, match="invalid JSON"):
+                    cc.main()
+        finally:
+            os.unlink(name)
 
     def test_non_object_body(self) -> None:
         with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+            name = f.name
             json.dump([1, 2, 3], f)
-            f.flush()
-            try:
-                with patch("sys.argv", ["check_cache.py", "--provider", "anthropic", "--body", f.name]):
-                    with pytest.raises(SystemExit, match="body must be a JSON object"):
-                        cc.main()
-            finally:
-                os.unlink(f.name)
+        try:
+            with patch("sys.argv", ["check_cache.py", "--provider", "anthropic", "--body", name]):
+                with pytest.raises(SystemExit, match="body must be a JSON object"):
+                    cc.main()
+        finally:
+            os.unlink(name)
 
 
 # ---------------------------------------------------------------------------
