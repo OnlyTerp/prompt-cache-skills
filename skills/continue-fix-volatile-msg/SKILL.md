@@ -1,83 +1,76 @@
 ---
 name: continue-fix-volatile-msg
-description: Continue inherits the Cline-family volatile-message cache bug. Same fix shape.
+description: Ladder-aware Continue Anthropic caching — verify the rolling ladder on the wire, then enable it by default and add TTL coverage.
 target_harness: Continue
 target_repo: continuedev/continue
 target_files:
   - packages/openai-adapters/src/apis/Anthropic.ts
   - core/llm/llms/Bedrock.ts
-target_commit: main (last push 2026-05-26)
-estimated_savings: ~30% wasted cache write premium eliminated per turn
+target_commit: main (AnthropicUtils.ts addCacheControlToLastTwoUserMessages verified 2026-08-28)
+estimated_savings: avoids a harmful "fix"; default-on + TTL are the real wins
 ---
 
-# Continue: fix volatile-message cache thrash
+# Continue: the "volatile message" is a rolling ladder — verify, don't rip out
+
+> **REANALYZED 2026-08-28.** The previous version of this skill
+> renamed `addCacheControlToLastTwoUserMessages` to a "last stable
+> message" variant. Direct source recon shows Continue ships the same
+> documented rolling read/write ladder as Cline/Roo (the helper name
+> persists in `packages/openai-adapters/src/apis/AnthropicUtils.ts`).
+> Applying the old diff would remove a working cache write point.
 
 ## Target
 
-`packages/openai-adapters/src/apis/Anthropic.ts` and
-`core/llm/llms/Bedrock.ts` in `continuedev/continue`. The relevant
-function is `addCacheControlToLastTwoUserMessages` (Anthropic) and
-`_addCachingToLastTwoUserMessages` (Bedrock).
+`packages/openai-adapters/src/apis/AnthropicUtils.ts` (helper) and its
+callers in the Anthropic adapter; `core/llm/llms/Bedrock.ts`
+(`_addCachingToLastTwoUserMessages`, `cachePoint` shape) for the
+Bedrock path.
 
-## Symptom
+## What Continue actually does
 
-Same as [`cline-fix-volatile-msg`](../cline-fix-volatile-msg/SKILL.md)
-and [`roo-fix-volatile-msg`](../roo-fix-volatile-msg/SKILL.md):
-Continue caches the last 2 USER messages, including the current
-user turn which changes every request. Pays write premium for zero
-reads on that breakpoint every turn.
+Same two-breakpoint ladder as Cline/Roo: current user turn = write
+point, previous user turn = read point. See
+[cline-fix-volatile-msg](../cline-fix-volatile-msg/SKILL.md) for the
+full explanation and the 3-turn wire test. Continue's distinct problem
+is not the ladder — it's that caching is **gated behind config and
+off by default**, so most users get nothing at all, and no TTL
+extension exists for long sessions.
 
-## Fix
+## Step 1 — verify the ladder on the wire (before any change)
 
-Rename and rewire the function to target stable messages (the
-previous assistant turn) instead of user messages:
+Same 3-turn capture as the Cline skill. Continue gates the whole
+caching path behind `cacheBehavior` config — if the capture shows
+zero cache fields in the request at all, fix the config first (next
+step) and re-capture before judging the ladder.
 
-### Anthropic
+## Step 2 — default-on (the actual money fix)
 
-```diff
---- a/packages/openai-adapters/src/apis/Anthropic.ts
-+++ b/packages/openai-adapters/src/apis/Anthropic.ts
-@@
--function addCacheControlToLastTwoUserMessages(messages: Message[]) {
--  const userIdxs = messages
--    .map((m, i) => (m.role === "user" ? i : -1))
--    .filter(i => i >= 0);
--  const lastTwo = userIdxs.slice(-2);
--  for (const idx of lastTwo) {
-+function addCacheControlToLastStableMessage(messages: Message[]) {
-+  // Cache the last STABLE message (not the volatile current user turn).
-+  // Stable = the message before the user's in-flight request.
-+  if (messages.length < 2) return;
-+  const idx = messages.length - 2;
-+  {
-     const m = messages[idx];
-     // ...existing logic to attach cache_control to last content block
-   }
- }
-```
+Continue's `cacheBehavior` config defaults leave Anthropic caching
+off for most installs. See
+[continue-enable-defaults](../continue-enable-defaults/SKILL.md) —
+that skill remains the primary win for this harness. The ladder
+should be verified *after* defaults are on, never instead.
 
-Update the caller in `_convertBody()` to use the new name.
+## Step 3 — Bedrock path: verify the cachePoint translation
 
-### Bedrock
+Continue's Bedrock adapter re-implements caching with `cachePoint`
+(not `cache_control` — gotcha 12). Two checks before trusting it:
 
-Same shape in `core/llm/llms/Bedrock.ts` — replace the
-`_addCachingToLastTwoUserMessages` body with the
-`_addCachingToLastStableMessage` logic, using `cachePoint` instead of
-`cache_control`.
+1. The `cachePoint` placement mirrors the ladder (write point on the
+   current turn, read point on the previous) — same 3-turn wire test
+   through the Bedrock envelope, reading
+   `cacheReadInputTokenCount`/`cacheWriteInputTokenCount`.
+2. The Bedrock model ID in use actually supports cache points (gotcha
+   13 — the AWS support matrix drifts; verify, don't assume).
 
-## Verify
+## Verify (whole skill)
 
-Same procedure as the Cline skill — see
-[`cline-fix-volatile-msg/SKILL.md#verify`](../cline-fix-volatile-msg/SKILL.md).
-Wire-level assertion is identical: turn-2
-`cache_creation_input_tokens` should drop to ~0,
-`cache_read_input_tokens` should cover the full prefix.
+After default-on: request bodies contain `cache_control` on the
+ladder positions; 3-turn capture shows the write@N → read@N+1
+pattern; Bedrock capture shows the same through `cachePoint`.
 
 ## Background
 
-This is the third instance of the same copy-paste bug (Cline → Roo →
-Continue). Apply this skill alongside
-[`continue-enable-defaults`](../continue-enable-defaults/SKILL.md)
-so users don't get the bug surfaced by the default-on change.
-
-Full audit: [`audits/continue.md`](../../audits/continue.md).
+- [docs/gotchas.md](../../docs/gotchas.md) #12 (cachePoint), #17
+  (relay field-stripping), #18 (the ladder test).
+- Full audit: [audits/continue.md](../../audits/continue.md).
