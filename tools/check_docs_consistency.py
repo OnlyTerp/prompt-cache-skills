@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+from typing import NoReturn
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -79,7 +80,7 @@ REQUIRED_CLAUDE_CODE_PHRASES = [
 ]
 
 
-def fail(message: str) -> None:
+def fail(message: str) -> NoReturn:
     raise SystemExit(message)
 
 
@@ -182,6 +183,73 @@ def check_local_markdown_links() -> None:
         fail(f"missing local markdown links: {missing_links}")
 
 
+REQUIRED_SKILL_FRONTMATTER = [
+    "name",
+    "description",
+    "target_harness",
+    "target_files",
+    "target_commit",
+    "estimated_savings",
+]
+
+
+def parse_skill_frontmatter(path: Path) -> dict[str, list[str]]:
+    """Minimal YAML-subset parser for skill frontmatter.
+
+    Supports `key: value` and `key:` followed by `  - item` lines — enough
+    for the skill format; not a general YAML parser.
+    """
+    text = path.read_text(errors="replace")
+    m = re.match(r"^---\r?\n(.*?)\r?\n---", text, re.DOTALL)
+    if not m:
+        fail(f"{path.relative_to(ROOT)}: missing frontmatter block")
+    block = m.group(1)
+    data: dict[str, list[str]] = {}
+    current: str | None = None
+    for line in block.splitlines():
+        if re.match(r"^\s+-\s+", line) and current:
+            data[current].append(re.sub(r"^\s+-\s+", "", line).strip())
+        elif re.match(r"^[A-Za-z_-]+:", line):
+            key, _, rest = line.partition(":")
+            current = key.strip()
+            data.setdefault(current, [])
+            if rest.strip():
+                data[current].append(rest.strip())
+    return data
+
+
+def check_skills_index() -> None:
+    skills_dir = ROOT / "skills"
+    skill_dirs = sorted(
+        p.name for p in skills_dir.iterdir()
+        if p.is_dir() and p.name != "_TEMPLATE"
+    )
+    # 1. Every skill dir has a SKILL.md with required frontmatter keys.
+    for name in skill_dirs:
+        sf = skills_dir / name / "SKILL.md"
+        if not sf.exists():
+            fail(f"skills/{name}/ has no SKILL.md")
+        fm = parse_skill_frontmatter(sf)
+        for key in REQUIRED_SKILL_FRONTMATTER:
+            if key not in fm or not fm[key]:
+                fail(f"skills/{name}/SKILL.md missing frontmatter key: {key}")
+        if fm["name"] != [name]:
+            fail(f"skills/{name}/SKILL.md name mismatch: {fm['name']}")
+    # 2. skills/README.md index rows match the actual directory.
+    readme = (skills_dir / "README.md").read_text(errors="replace")
+    index_rows = []
+    for line in readme.splitlines():
+        if line.startswith("| ["):
+            m = re.match(r"\|\s*\[([^\]]+)\]", line)
+            if m:
+                index_rows.append(m.group(1).strip())
+    if sorted(index_rows) != skill_dirs:
+        fail(
+            f"skills/README.md index drifted: rows={sorted(index_rows)} "
+            f"dirs={skill_dirs}"
+        )
+
+
 def main() -> None:
     check_audit_counts()
     check_readme_tables()
@@ -189,6 +257,7 @@ def main() -> None:
     check_stale_phrases()
     check_claude_desktop_code_phrasing()
     check_local_markdown_links()
+    check_skills_index()
     print("docs consistency ok")
 
 
