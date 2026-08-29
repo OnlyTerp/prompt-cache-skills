@@ -63,6 +63,41 @@ Mirrors Anthropic's shape but inside the Bedrock response envelope. Look
 for `cacheReadInputTokenCount` / `cacheWriteInputTokenCount` (note the
 camelCase difference).
 
+### DeepSeek (V3 / R1 / successors)
+
+Top-level counters, not nested details:
+
+```jsonc
+"usage": {
+  "prompt_tokens": 2104,
+  "prompt_cache_hit_tokens": 1920,   // served from cache (10% price)
+  "prompt_cache_miss_tokens": 184    // uncached input
+}
+```
+
+`prompt_cache_hit_tokens` is the cache-read count; hit rate =
+`prompt_cache_hit_tokens / prompt_tokens`. Context caching is automatic
+on 64k-boundary prefixes — no opt-in field exists; a 0% hit rate means
+your prefix is unstable (timestamps, rotating IDs) or shorter than one
+64-token chunk past the cacheable floor.
+
+### OpenRouter
+
+Reports a unified usage object, but only when the request asks for it:
+send `"usage": {"include": true}` in the body, otherwise `usage` is
+absent on streaming responses. Cache fields come through as the
+underlying provider's shape (e.g. Anthropic `cache_read_input_tokens`,
+OpenAI `prompt_tokens_details.cached_tokens`), so parse per upstream
+model. `tools/check_cache.py --provider openrouter` injects this
+flag automatically.
+
+### xAI (Grok)
+
+OpenAI-compatible `prompt_tokens_details.cached_tokens` under the usual
+`usage` object. Prefix caching is automatic (no opt-in); check that the
+harness isn't rotating conversation-scoped identifiers in the prefix —
+xAI keys cache on the exact prefix like OpenAI.
+
 ### Vertex AI
 
 For Anthropic models on Vertex: identical to direct Anthropic.
