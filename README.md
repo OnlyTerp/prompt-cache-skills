@@ -191,6 +191,34 @@ right. This repo does that work for you.
 
 ---
 
+### 2026-08-28 re-verification (august wave)
+
+Upstream release versions were re-fetched live from the GitHub Releases
+API on 2026-08-28 and the highest-value Anthropic-format code paths
+re-read at current `main`. Headline result: **the "last 2 user messages"
+pattern in Cline / Roo Code / Continue is Anthropic's rolling
+read/write ladder, not a burn** — the pinned-commit skills for those
+three were rederived (see `skills/*-fix-volatile-msg/`). Verified
+current versions at re-verification time:
+
+| Harness | Latest release (fetched 2026-08-28) |
+|---------|--------------------------------------|
+| Cline | desktop-v0.0.20 (published 2026-08-28) |
+| Roo Code | v3.54.0 (2026-05-15) |
+| Continue | v2.0.0-vscode (2026-06-19) |
+| Aider | v0.86.0 (2025-08-09) |
+| OpenCode | v1.18.25 (2026-08-28) |
+| Kilo Code | v7.5.6 (2026-08-28) |
+| Codex CLI | rust-v0.150.1 (2026-08-27) |
+| Claude Code | v2.1.251 (2026-08-28) |
+
+Cline's `src/core/api/transform/anthropic-format.ts` is byte-identical
+between pinned commit `65e9727c` and current `main`; its own comment
+documents the ladder ("The last two user messages extend the cached
+prefix each turn"). Avante.nvim (`claude.lua` / `vertex_claude.lua`)
+uses the same last-tool + cache-on-supports pattern; its
+`support_prompt_caching` gate is correct per-provider.
+
 ## The grade card
 
 <p align="center">
