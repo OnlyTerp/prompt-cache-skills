@@ -228,9 +228,13 @@ Full per-provider breakdown with file:line citations in
   <img src="assets/findings.svg" alt="Seven headline findings from the audit" width="900">
 </p>
 
-1. **The "last 2 user messages" pattern is a copy-paste bug** that
-   propagated Cline → Roo → Continue. All three burn a breakpoint on
-   the volatile current turn. Same one-line fix in each.
+1. **The "last 2 user messages" pattern propagated Cline → Roo →
+   Continue — but it's a rolling read/write ladder, not a burn.** The
+   current turn's breakpoint is a cache *write* that the next request
+   *reads*. Real harnesses still lose money here (Continue gates it
+   behind an off-by-default flag; none extends TTL past 5min), but the
+   original "copy-paste bug" framing was wrong — see gotcha 18 for the
+   3-turn ladder test before touching any of these.
 2. **Cline OpenAI native is silently broken** — no `prompt_cache_key`,
    no prefix-stability work. Users on Cline+OpenAI pay full price.
 3. **Gemini explicit caching is universally unimplemented.** Only

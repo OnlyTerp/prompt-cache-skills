@@ -176,3 +176,34 @@ hitting.
 OpenAI prefix caching is org-scoped. Running the same prompt across two
 org IDs (e.g., personal + work) caches separately. Anthropic is
 account-scoped similarly.
+
+### 17. A relay can 200-accept cache fields and silently drop them
+
+HTTP 200 does not mean honored. OpenAI-compatible relays, gateways, and
+"custom provider" endpoints routinely accept request bodies containing
+fields they don't implement (`cache_control`, `prompt_cache_key`,
+`usage: {include: true}`) and strip them server-side. The wire looks
+perfect; the cache never engages. Symptom: valid cache-control on every
+request, `cached_tokens: 0` forever, no errors anywhere.
+
+Test against the *actual endpoint in your path*, not the upstream
+provider's docs: `tools/check_cache.py --provider custom` exists for
+exactly this. If a relay drops fields, the fix belongs in the relay
+(passthrough the fields, or translate them to the relay's native
+caching API), not in your harness config.
+
+### 18. "Last two user messages" can be a deliberate rolling ladder
+
+A breakpoint on the current turn looks like the classic volatile-content
+bug (gotcha 1) — but the pattern Cline/Roo/Continue ship is a
+two-breakpoint rolling ladder: the current turn's breakpoint is a
+**write** that the next request **reads** (the previous turn's
+breakpoint becomes the read point). On a normal agent loop this costs
+one write premium per turn and recovers it on the next — not thrash.
+
+Before "fixing" a last-two pattern, verify across at least three
+consecutive turns: if turn N's write is turn N+1's read (cache_read ≈
+previous turn's cache_creation), it's a working ladder — leave it
+alone. Thrash looks like cache_creation on *every* turn with
+cache_read ≈ 0 throughout. The audits that called this a copy-paste bug
+predate the comment documenting the ladder in all three harnesses.

@@ -90,10 +90,12 @@ Top-level `prompt_cache_ttl` is silently dropped (OpenCode #16848).
 
 ## Headline findings
 
-1. **The "last 2 user messages" pattern is a copy-paste mistake** that
-   has propagated through Cline → Roo → Continue. All three burn a
-   breakpoint on the volatile current user turn. Fix is the same diff
-   in each.
+1. **The "last 2 user messages" pattern propagated through Cline → Roo →
+   Continue, but is a rolling read/write ladder, not a burn.** The
+   current turn's breakpoint is a cache write the next request reads.
+   Losses come from the 5min TTL (no 1h extension anywhere) and
+   Continue's off-by-default gating — not from a broken breakpoint.
+   See gotcha 18 for the 3-turn ladder test before patching.
 
 2. **OpenAI Chat Completions caching is silently broken in Cline.**
    No `prompt_cache_key`, no prefix-stability work — users on OpenAI
