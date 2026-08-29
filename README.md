@@ -294,6 +294,12 @@ Run it before and after applying a skill. You should see
 `cache_read_input_tokens` (Anthropic) or `cached_tokens` (OpenAI) or
 `cachedContentTokenCount` (Gemini) go from 0 to most of your input.
 
+For TTL probes, pass `--sleep SECONDS` to control the gap between the
+cold and warm requests — e.g. `--sleep 360` tests whether a 5-minute
+idle window expired the cache (Anthropic default TTL) before the warm
+shot. Pair it with the 3-turn ladder test in
+[docs/gotchas.md](docs/gotchas.md) #18.
+
 ---
 
 ## Contributing
