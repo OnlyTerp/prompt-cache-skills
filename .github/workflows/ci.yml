@@ -63,8 +63,15 @@ jobs:
         run: python3 tools/check_docs_consistency.py
 
   python-tests:
-    name: pytest
-    runs-on: ubuntu-latest
+    name: pytest (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Windows is in the matrix because cache-token parsing and temp-file
+        # handling are exactly where OS-portability bugs hide (e.g. open
+        # handles breaking os.unlink with WinError 32).
+        os: [ubuntu-latest, windows-latest]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -73,7 +80,7 @@ jobs:
       - name: install deps
         run: pip install pytest
       - name: run tests
-        run: python3 -m pytest tests/ -v
+        run: python -m pytest tests/ -v
 
   python-typecheck:
     name: mypy
